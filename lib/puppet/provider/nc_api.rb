@@ -17,6 +17,7 @@ require 'openssl'
       http.ca_file     = ca_file
       req              = Net::HTTP::Get.new("/classifier-api/v1/#{endpoint}")
       resp             = http.request(req)
+      debug "Response code #{resp.code}"
       resp.body
     end
   end

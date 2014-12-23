@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
+require 'pry'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
@@ -7,9 +8,15 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     ngs = JSON.parse(rest('GET', 'groups'))
     ngs.collect do |group|
       new(
-        :name   => group['name'],
-        :ensure => :present,
-        :id     => group['id']
+        :name                 => group['name'],
+        :ensure               => :present,
+        :id                   => group['id'],
+        :override_environment => group['environment_trumps'],
+        :parent               => group['parent'],
+        :rule                 => group['rule'],
+        :variables            => group['variables'],
+        :environment          => group['environment'],
+        :classes              => group['classes']
       )
     end
   end
@@ -28,24 +35,5 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   end
 
   mk_resource_methods
-
-  def self.rest(method, endpoint, data=false)
-    cert    = OpenSSL::X509::Certificate.new(File.read('/etc/puppetlabs/puppet/ssl/certs/pe-internal-dashboard.pem'))
-    key     = OpenSSL::PKey::RSA.new(File.read('/etc/puppetlabs/puppet/ssl/private_keys/pe-internal-dashboard.pem'))
-    ca_file = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
-
-    case method
-    when 'GET'
-      http             = Net::HTTP.new('puppet', 4433)
-      http.use_ssl     = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-      http.cert        = cert
-      http.key         = key
-      http.ca_file     = ca_file
-      req              = Net::HTTP::Get.new("/classifier-api/v1/#{endpoint}")
-      resp             = http.request(req)
-      resp.body
-    end
-  end
 
 end
