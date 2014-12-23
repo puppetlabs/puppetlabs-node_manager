@@ -7,7 +7,6 @@ Puppet::Type.type(:node_group).provide(:node_group) do
 
   def self.instances
     ngs = JSON.parse(rest('GET', 'groups'))
-    binding.pry
     ngs.collect do |group|
       new(
         :name   => group['name'],
