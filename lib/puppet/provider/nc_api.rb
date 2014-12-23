@@ -1,33 +1,6 @@
-require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
-require 'json'
-
-Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
-
-  def self.instances
-    ngs = JSON.parse(rest('GET', 'groups'))
-    ngs.collect do |group|
-      new(
-        :name   => group['name'],
-        :ensure => :present,
-        :id     => group['id']
-      )
-    end
-  end
-
-  def self.prefetch(resources)
-    ngs = instances
-    resources.keys.each do |group|
-      if provider = ngs.find{ |g| g.name == group }
-        resources[group].provider = provider
-      end
-    end
-  end
-
-  def exists?
-    @property_hash[:ensure] == :present
-  end
-
-  mk_resource_methods
+class Puppet::Provider::Nc_api < Puppet::Provider
+require 'net/http'
+require 'openssl'
 
   def self.rest(method, endpoint, data=false)
     cert    = OpenSSL::X509::Certificate.new(File.read('/etc/puppetlabs/puppet/ssl/certs/pe-internal-dashboard.pem'))
