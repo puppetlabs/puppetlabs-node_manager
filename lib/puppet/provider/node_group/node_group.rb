@@ -1,7 +1,6 @@
 require 'net/http'
 require 'openssl'
 require 'json'
-require 'pry'
 
 Puppet::Type.type(:node_group).provide(:node_group) do
 
@@ -23,6 +22,10 @@ Puppet::Type.type(:node_group).provide(:node_group) do
         resources[group].provider = provider
       end
     end
+  end
+
+  def exists?
+    @property_hash[:ensure] == :present
   end
 
   mk_resource_methods
