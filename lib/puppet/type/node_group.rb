@@ -30,11 +30,17 @@ Puppet::Type.newtype(:node_group) do
     validate do |value|
       fail("Variables must be supplied as a hash") unless value.is_a?(Hash)
     end
+    munge do |value|
+      value.to_h
+    end
   end
   newproperty(:rule) do
     desc 'Match conditions for this group'
     validate do |value|
       fail("Rules must be supplied as a hash") unless value.is_a?(Hash)
+    end
+    munge do |value|
+      value.to_a
     end
   end
   newproperty(:environment) do
@@ -49,6 +55,9 @@ Puppet::Type.newtype(:node_group) do
     defaultto {}
     validate do |value|
       fail("Classes must be supplied as a hash") unless value.is_a?(Hash)
+    end
+    munge do |value|
+      value.to_h
     end
   end
 end

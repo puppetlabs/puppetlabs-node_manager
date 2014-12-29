@@ -38,7 +38,6 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
 
   def create
     # Only passing parameters that are given
-    binding.pry
     data = self.data_hash(@resource.original_parameters)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
     exists? ? (return true) : (return false)
@@ -47,23 +46,30 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   def data_hash(param_hash)
     # API will fail if disallowed-keys are passed
     filter_keys = [
-      'name',
-      'id',
-      'environment_override',
-      'parent',
-      'rule',
-      'variables',
-      'environment',
-      'classes'
+      :classes,
+      :environment,
+      :environment_override,
+      :id,
+      :name,
+      :parent,
+      :rule,
+      :variables
     ]
     # namevar may not be in this hash 
-    param_hash['name'] = resource[:name] unless param_hash['name']
+    param_hash[:name] = resource[:name] unless param_hash[:name]
     # key changed for usability
-    param_hash['environment_override'] = param_hash['environment_trumps'] if param_hash['environment_trumps']
+    param_hash[:environment_override] = param_hash[:environment_trumps] if param_hash[:environment_trumps]
+    # Passing an empty hash results in undef
+    param_hash[:classes] = {} unless param_hash[:classes]
+
     # Construct JSON string, not JSON object
     data = '{ '
+    binding.pry
     param_hash.each do |k,v|
-      data += "\"#{k}\": \"#{v}\"," if filter_keys.include? k
+      if filter_keys.include? k
+        data += "\"#{k}\": "
+        data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
+      end
     end
     data = data.gsub(/^(.*),/, '\1 }')
     debug data
