@@ -1,4 +1,5 @@
 Puppet::Type.newtype(:node_group) do
+  id_format = /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
   desc 'The node_group type creates and managed node groups for the PE NC'
   ensurable
   newparam(:name, :namevar => true) do
@@ -10,7 +11,7 @@ Puppet::Type.newtype(:node_group) do
   newproperty(:id) do
     desc 'The ID of the group'
     validate do |value|
-      fail("ID should be numbers and dashes") unless value =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+      fail("ID should be numbers and dashes") unless value =~ id_format
     end
   end
   newproperty(:override_environment) do
@@ -21,7 +22,7 @@ Puppet::Type.newtype(:node_group) do
   newproperty(:parent) do
     desc 'The ID of the parent group'
     validate do |value|
-      fail("ID should be numbers and dashes") unless value =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+      fail("ID should be numbers and dashes") unless value =~ id_format
     end
   end
   newproperty(:variables) do

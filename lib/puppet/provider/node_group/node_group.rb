@@ -37,17 +37,17 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   mk_resource_methods
 
   def create
+    binding.pry
     data = self.data_hash(@resource.original_parameters)
-    resp = rest('POST', 'groups', data)
+    resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
     exists? ? (return true) : (return false)
   end
 
   def data_hash(param_hash)
-    data = '{ '
+    data = {}
     param_hash.each do |k,v|
-      data += "'#{k}': '#{v}',"
+      data[k] = v unless k == :ensure
     end
-    data = data.gsub(/^(.*),/, '\1 }')
     debug data
     data
   end
