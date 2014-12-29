@@ -19,6 +19,17 @@ require 'openssl'
       resp             = http.request(req)
       debug "Response code #{resp.code}"
       resp.body
+    when 'POST'
+      http             = Net::HTTP.new('puppet', 4433)
+      http.use_ssl     = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.cert        = cert
+      http.key         = key
+      http.ca_file     = ca_file
+      req              = Net::HTTP::Get.new("/classifier-api/v1/#{endpoint}")
+      resp             = http.request(req)
+      debug "Response code #{resp.code}"
+      resp
     end
   end
 

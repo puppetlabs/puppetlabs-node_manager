@@ -36,4 +36,20 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
 
   mk_resource_methods
 
+  def create
+    data = self.data_hash(@resource.original_parameters)
+    resp = rest('POST', 'groups', data)
+    exists? ? (return true) : (return false)
+  end
+
+  def data_hash(param_hash)
+    data = '{ '
+    param_hash.each do |k,v|
+      data += "'#{k}': '#{v}',"
+    end
+    data = data.gsub(/^(.*),/, '\1 }')
+    debug data
+    data
+  end
+
 end
