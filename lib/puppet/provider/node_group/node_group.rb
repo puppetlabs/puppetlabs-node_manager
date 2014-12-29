@@ -37,6 +37,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   mk_resource_methods
 
   def create
+    # Only passing parameters that are given
     binding.pry
     data = self.data_hash(@resource.original_parameters)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
@@ -44,10 +45,27 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   end
 
   def data_hash(param_hash)
-    data = {}
+    # API will fail if disallowed-keys are passed
+    filter_keys = [
+      'name',
+      'id',
+      'environment_override',
+      'parent',
+      'rule',
+      'variables',
+      'environment',
+      'classes'
+    ]
+    # namevar may not be in this hash 
+    param_hash['name'] = resource[:name] unless param_hash['name']
+    # key changed for usability
+    param_hash['environment_override'] = param_hash['environment_trumps'] if param_hash['environment_trumps']
+    # Construct JSON string, not JSON object
+    data = '{ '
     param_hash.each do |k,v|
-      data[k] = v unless k == :ensure
+      data += "\"#{k}\": \"#{v}\"," if filter_keys.include? k
     end
+    data = data.gsub(/^(.*),/, '\1 }')
     debug data
     data
   end

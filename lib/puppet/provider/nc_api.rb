@@ -13,10 +13,10 @@ require 'openssl'
 
     case method
     when 'GET'
-      req           = Net::HTTP::Get.new("/classifier-api/v1/#{endpoint}")
+      req      = Net::HTTP::Get.new("/classifier-api/v1/#{endpoint}")
     when 'POST'
-      req           = Net::HTTP::Post.new("/classifier-api/v1/#{endpoint}")
-      req.form_data = data
+      req      = Net::HTTP::Post.new("/classifier-api/v1/#{endpoint}")
+      req.body = data
     else
       fail "#{method} is not a supported method."
     end
@@ -27,7 +27,7 @@ require 'openssl'
     if resp.code == '200'
       resp.body
     else
-      fail "#{resp.code}: #{resp.message}"
+      fail "#{resp.code}: #{resp.message}\n#{resp.body}"
     end
 
   end

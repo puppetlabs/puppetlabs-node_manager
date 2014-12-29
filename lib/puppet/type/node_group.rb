@@ -46,6 +46,7 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:classes) do
     desc 'Classes applied to this group'
+    defaultto {}
     validate do |value|
       fail("Classes must be supplied as a hash") unless value.is_a?(Hash)
     end
