@@ -61,6 +61,13 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     exists? ? (return true) : (return false)
   end
 
+  def destroy
+    resp = Puppet::Provider::Nc_api.rest('DELETE', "groups/#{@resource[:id]}")
+
+    @property_hash.clear
+    exists? ? (return false) : (return true)
+  end
+
   def data_hash(param_hash)
     # API will fail if disallowed-keys are passed
     filter_keys = [
