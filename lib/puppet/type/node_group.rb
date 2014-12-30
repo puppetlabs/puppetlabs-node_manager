@@ -16,7 +16,6 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:override_environment) do
     desc 'Override parent environments'
-    defaultto :false
     newvalues(:false, :true)
   end
   newproperty(:parent) do
