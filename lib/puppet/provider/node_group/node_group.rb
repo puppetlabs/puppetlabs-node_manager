@@ -1,6 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
-require 'pry'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
@@ -11,7 +10,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
         :name                 => group['name'],
         :ensure               => :present,
         :id                   => group['id'],
-        :override_environment => group['environment_trumps'],
+        :override_environment => group['environment_trumps'].to_s,
         :parent               => group['parent'],
         :rule                 => group['rule'],
         :variables            => group['variables'],
@@ -64,7 +63,6 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
 
     # Construct JSON string, not JSON object
     data = '{ '
-    binding.pry
     param_hash.each do |k,v|
       if filter_keys.include? k
         data += "\"#{k}\": "
