@@ -37,8 +37,27 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
 
   def create
     # Only passing parameters that are given
-    data = self.data_hash(@resource.original_parameters)
+    send_data = @resource.original_parameters
+    # namevar may not be in this hash 
+    send_data[:name] = resource[:name] unless send_data[:name]
+    # key changed for usability
+    send_data[:environment_override] = send_data[:environment_trumps] if send_data[:environment_trumps]
+    # Passing an empty hash results in undef
+    send_data[:classes] = {} unless send_data[:classes]
+
+    data = self.data_hash(send_data)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
+
+    @property_hash[:ensure]               = :present
+    @property_hash[:classes]              = @resource[:classes]
+    @property_hash[:environment]          = @resource[:environment]
+    @property_hash[:environment_override] = @resource[:environment_override]
+    @property_hash[:id]                   = @resource[:id]
+    @property_hash[:name]                 = @resource[:name]
+    @property_hash[:parent]               = @resource[:parent]
+    @property_hash[:rule]                 = @resource[:rule]
+    @property_hash[:variables]            = @resource[:variables]
+
     exists? ? (return true) : (return false)
   end
 
@@ -54,12 +73,6 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
       :rule,
       :variables
     ]
-    # namevar may not be in this hash 
-    param_hash[:name] = resource[:name] unless param_hash[:name]
-    # key changed for usability
-    param_hash[:environment_override] = param_hash[:environment_trumps] if param_hash[:environment_trumps]
-    # Passing an empty hash results in undef
-    param_hash[:classes] = {} unless param_hash[:classes]
 
     # Construct JSON string, not JSON object
     data = '{ '

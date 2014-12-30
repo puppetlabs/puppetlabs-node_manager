@@ -1,6 +1,7 @@
 class Puppet::Provider::Nc_api < Puppet::Provider
 require 'net/http'
 require 'openssl'
+require 'pry'
 
   def self.rest(method, endpoint, data=false)
 
@@ -24,12 +25,19 @@ require 'openssl'
     req['Content-Type'] = 'application/json'
     resp                = http.request(req)
     debug "Response code #{resp.code}"
-    if resp.code == '200'
+
+    case resp.code
+    when '200'
       resp.body
+    when '303'
+      info "New group at #{resp['Location']}"
+      resp.body 
+    when '422'
     else
       fail "#{resp.code}: #{resp.message}\n#{resp.body}"
+      jresp = JSON.parse(resp.body)
+      debug jresp['kind']
     end
 
   end
-
 end
