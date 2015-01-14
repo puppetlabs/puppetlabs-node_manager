@@ -3,20 +3,41 @@ require 'json'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
+  # API will fail if disallowed-keys are passed
+  def self.friendly_name
+    {
+      :classes            => 'classes',
+      :environment        => 'environment',
+      :environment_trumps => 'override_environment',
+      :id                 => 'id',
+      :name               => 'name',
+      :parent             => 'parent',
+      :rule               => 'rule',
+      :variables          => 'variables'
+    }
+  end
+
   def self.instances
     ngs = JSON.parse(rest('GET', 'groups'))
     ngs.collect do |group|
-      new(
-        :name                 => group['name'],
-        :ensure               => :present,
-        :id                   => group['id'],
-        :override_environment => group['environment_trumps'].to_s,
-        :parent               => group['parent'],
-        :rule                 => group['rule'],
-        :variables            => group['variables'],
-        :environment          => group['environment'],
-        :classes              => group['classes']
-      )
+      ngs_hash = {}
+      friendly_name.each do |property,friendly|
+        ngs_hash[friendly.to_sym] = group[property.to_s]
+      end
+      ngs_hash[:ensure] = :present
+      binding.pry
+      new(ngs_hash)
+      #new(
+      #  :classes              => group['classes'],
+      #  :ensure               => :present,
+      #  :environment          => group['environment'],
+      #  :override_environment => group['environment_trumps'].to_s,
+      #  :id                   => group['id'],
+      #  :name                 => group['name'],
+      #  :parent               => group['parent'],
+      #  :rule                 => group['rule'],
+      #  :variables            => group['variables']
+      #)
     end
   end
 
@@ -41,19 +62,19 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     # namevar may not be in this hash 
     send_data[:name] = resource[:name] unless send_data[:name]
     # key changed for usability
-    send_data[:environment_override] = send_data[:environment_trumps] if send_data[:environment_trumps]
+    send_data[:override_environment] = send_data[:environment_trumps] if send_data[:environment_trumps]
     # Passing an empty hash results in undef
     send_data[:classes] = {} unless send_data[:classes]
 
     data = self.data_hash(send_data)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
 
-    @property_hash[:ensure]               = :present
     @property_hash[:classes]              = @resource[:classes]
+    @property_hash[:ensure]               = :present
     @property_hash[:environment]          = @resource[:environment]
-    @property_hash[:environment_override] = @resource[:environment_override]
     @property_hash[:id]                   = @resource[:id]
     @property_hash[:name]                 = @resource[:name]
+    @property_hash[:override_environment] = @resource[:override_environment]
     @property_hash[:parent]               = @resource[:parent]
     @property_hash[:rule]                 = @resource[:rule]
     @property_hash[:variables]            = @resource[:variables]
@@ -69,22 +90,21 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   end
 
   def data_hash(param_hash)
-    # API will fail if disallowed-keys are passed
-    filter_keys = [
-      :classes,
-      :environment,
-      :environment_override,
-      :id,
-      :name,
-      :parent,
-      :rule,
-      :variables
-    ]
+    #filter_keys = [
+    #  :classes,
+    #  :environment,
+    #  :id,
+    #  :name,
+    #  :override_environment,
+    #  :parent,
+    #  :rule,
+    #  :variables
+    #]
 
     # Construct JSON string, not JSON object
     data = '{ '
     param_hash.each do |k,v|
-      if filter_keys.include? k
+      if self.friendly_name.include? k
         data += "\"#{k}\": "
         data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
       end
