@@ -4,6 +4,7 @@ require 'json'
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
   # API will fail if disallowed-keys are passed
+  # Decided to use override_environment instead
   def self.friendly_name
     {
       :classes            => 'classes',
@@ -25,19 +26,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
         ngs_hash[friendly.to_sym] = group[property.to_s]
       end
       ngs_hash[:ensure] = :present
-      binding.pry
       new(ngs_hash)
-      #new(
-      #  :classes              => group['classes'],
-      #  :ensure               => :present,
-      #  :environment          => group['environment'],
-      #  :override_environment => group['environment_trumps'].to_s,
-      #  :id                   => group['id'],
-      #  :name                 => group['name'],
-      #  :parent               => group['parent'],
-      #  :rule                 => group['rule'],
-      #  :variables            => group['variables']
-      #)
     end
   end
 
@@ -63,48 +52,42 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     send_data[:name] = resource[:name] unless send_data[:name]
     # key changed for usability
     send_data[:override_environment] = send_data[:environment_trumps] if send_data[:environment_trumps]
-    # Passing an empty hash results in undef
+    # Passing an empty hash in the type results in undef
     send_data[:classes] = {} unless send_data[:classes]
 
     data = self.data_hash(send_data)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
 
-    @property_hash[:classes]              = @resource[:classes]
-    @property_hash[:ensure]               = :present
-    @property_hash[:environment]          = @resource[:environment]
-    @property_hash[:id]                   = @resource[:id]
-    @property_hash[:name]                 = @resource[:name]
-    @property_hash[:override_environment] = @resource[:override_environment]
-    @property_hash[:parent]               = @resource[:parent]
-    @property_hash[:rule]                 = @resource[:rule]
-    @property_hash[:variables]            = @resource[:variables]
+    send_data.each_key do |k|
+      @property_hash[k] = @resource[k]
+    end
 
     exists? ? (return true) : (return false)
   end
 
   def destroy
-    resp = Puppet::Provider::Nc_api.rest('DELETE', "groups/#{@resource[:id]}")
-
+    resp = Puppet::Provider::Nc_api.rest('DELETE', "groups/#{@property_hash[:id]}")
     @property_hash.clear
     exists? ? (return false) : (return true)
   end
 
-  def data_hash(param_hash)
-    #filter_keys = [
-    #  :classes,
-    #  :environment,
-    #  :id,
-    #  :name,
-    #  :override_environment,
-    #  :parent,
-    #  :rule,
-    #  :variables
-    #]
+  friendly_name.each do |property,friendly|
+    define_method "#{property.to_s}=" do |value|
+      binding.pry
+      send_data = {}
+      send_data[property] = value
+      data = self.data_hash(send_data)
+      Puppet::Provider::Nc_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
+      @property_hash[property] = @resource[friendly.to_sym]
+    end
+  end
 
+  def data_hash(param_hash)
     # Construct JSON string, not JSON object
     data = '{ '
     param_hash.each do |k,v|
-      if self.friendly_name.include? k
+      friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
+      if friendlies.include? k
         data += "\"#{k}\": "
         data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
       end
