@@ -4,7 +4,7 @@
 ####Table of Contents
 1. [Overview](#overview)
 1. [Requirements] (#requirements)
-1. Types
+1. [Types] (#types)
   * [Node_group] (#node_group)
   * [Puppet_environment] (#puppet_environment)
 
@@ -17,7 +17,9 @@ Create and manage Node Manager API endpoints as resources.
 - *nix operating system
 - Puppet >= 3.7.1  
 
-## Node_group
+## Types
+
+### Node_group
 
 Enumerate all node groups:
 * `puppet resource node_group`<br />
@@ -60,7 +62,7 @@ The UID for the data group. Default: ``
 * `rules`<br />
 An array of classification rules. Default (empty hash): `{}`
 
-## Puppet_environment
+### Puppet_environment
 
 Enumerate all puppet environments:
 * `puppet resource puppet_environment`<br />
