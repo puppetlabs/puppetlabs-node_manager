@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
+require 'pry'
 
 Puppet::Type.type(:puppet_environment).provide(:puppet_environment, :parent => Puppet::Provider::Nc_api) do
 
@@ -25,9 +26,7 @@ Puppet::Type.type(:puppet_environment).provide(:puppet_environment, :parent => P
   def self.prefetch(resources)
     env = instances
     resources.keys.each do |env|
-      if provider = env.find{ |e| e.name == env }
-        resources[env].provider = provider
-      end
+      resources[env].provider = 'puppet_environment'
     end
   end
 
@@ -38,14 +37,13 @@ Puppet::Type.type(:puppet_environment).provide(:puppet_environment, :parent => P
   mk_resource_methods
 
   def create
+    binding.pry
     # Only passing parameters that are given
     send_data = @resource.original_parameters
-    # namevar may not be in this hash 
+    # namevar may not be in this hash
     send_data[:name] = resource[:name] unless send_data[:name]
 
-    friendlies = Puppet::Type::Puppet_environment::Providerpuppet_environment.friendly_name
-    data = Puppet::Provider::Nc_api.data_hash(send_data, friendlies)
-    resp = Puppet::Provider::Nc_api.rest('PUT', 'environments')
+    resp = Puppet::Provider::Nc_api.rest('PUT', "environments/#{send_data[:name]}")
 
     send_data.each_key do |k|
       @property_hash[k] = @resource[k]
