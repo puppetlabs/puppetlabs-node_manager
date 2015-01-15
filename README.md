@@ -14,10 +14,10 @@ Create and manage Node Manager API endpoints as resources.
 
 ## Node_group
 
-Enumerate all node groups
+Enumerate all node groups:
 * `puppet resource node_group`<br />
 
-Example output
+Example output for `puppet resource node_group default`
 ```
 node_group { 'default':
   ensure               => 'present',
@@ -51,3 +51,15 @@ The UID for the data group. Default: ``
 
 * `rules`<br />
 An array of classification rules. Default (empty hash): `{}`
+
+## Puppet_environment
+
+Enumerate all puppet environments:
+* `puppet resource node_group`<br />
+
+Example output for `puppet resource puppet_environment production`
+```
+puppet_environment { 'production':
+  ensure => 'present',
+}
+```
