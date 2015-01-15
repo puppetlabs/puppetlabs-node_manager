@@ -1,8 +1,6 @@
-require 'pry'
-
 Puppet::Type.newtype(:node_group) do
   id_format = /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
-  desc 'The node_group type creates and managed node groups for the PE NC'
+  desc 'The node_group type creates and manages node groups for the PE Node Manager'
   ensurable
   newparam(:name, :namevar => true) do
     desc 'This is the common name for the node group'
