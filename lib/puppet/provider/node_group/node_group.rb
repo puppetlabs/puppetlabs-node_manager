@@ -72,7 +72,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   end
 
   friendly_name.each do |property,friendly|
-    define_method "#{property.to_s}=" do |value|
+    define_method "#{friendly}=" do |value|
       binding.pry
       send_data = {}
       send_data[property] = value
