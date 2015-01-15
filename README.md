@@ -1,7 +1,12 @@
-node_manager
-============
 
-# Node_manager module
+#node_manager
+
+####Table of Contents
+1. [Overview](#overview)
+1. [Requirements] (#requirements)
+1. Types
+  * [Node_group] (#node_group)
+  * [Puppet_environment] (#puppet_environment)
 
 ## Overview
 
