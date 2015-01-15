@@ -39,6 +39,9 @@ are class parameters. Default (empty hash): `{}`
 * `environment`<br />
 Environment selected for this node group. Default: `production`
 
+* `name`<br />
+(namevar) Node group's name.
+
 * `id`<br />
 Universal ID for the group. This attribute is read-only.
 
@@ -55,7 +58,7 @@ An array of classification rules. Default (empty hash): `{}`
 ## Puppet_environment
 
 Enumerate all puppet environments:
-* `puppet resource node_group`<br />
+* `puppet resource puppet_environment`<br />
 
 Example output for `puppet resource puppet_environment production`
 ```
@@ -63,3 +66,7 @@ puppet_environment { 'production':
   ensure => 'present',
 }
 ```
+### Puppet_environment parameters
+
+* `name`<br />
+(namevar) Name of the Puppet environment on disk, i.e. the directory name in `$environmentpath`.
