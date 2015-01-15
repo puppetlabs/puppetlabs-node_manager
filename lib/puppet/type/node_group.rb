@@ -1,3 +1,5 @@
+require 'pry'
+
 Puppet::Type.newtype(:node_group) do
   id_format = /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
   desc 'The node_group type creates and managed node groups for the PE NC'
@@ -11,7 +13,7 @@ Puppet::Type.newtype(:node_group) do
   newproperty(:id) do
     desc 'The ID of the group'
     validate do |value|
-      fail("ID should be numbers and dashes") unless value =~ id_format
+      fail("ID is read-only")
     end
   end
   newproperty(:override_environment) do
@@ -29,18 +31,14 @@ Puppet::Type.newtype(:node_group) do
     validate do |value|
       fail("Variables must be supplied as a hash") unless value.is_a?(Hash)
     end
-    munge do |value|
-      value.to_h
-    end
   end
   newproperty(:rule) do
     desc 'Match conditions for this group'
-    validate do |value|
-      fail("Rules must be supplied as a hash") unless value.is_a?(Hash)
-    end
+    flat = []
     munge do |value|
-      value.to_a
+      flat << value
     end
+    flat.join(',')
   end
   newproperty(:environment) do
     desc 'Environment for this group'

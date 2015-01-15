@@ -56,7 +56,14 @@ require 'openssl'
     param_hash.each do |k,v|
       if !filter or filter.include? k
         data += "\"#{k}\": "
-        data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
+        if v.is_a?(String)
+          data += "\"#{v}\","
+        elsif v.is_a?(Hash)
+          data += v.to_s.gsub(/=>/, ':')
+          data += ','
+        else
+          data += "#{v},"
+        end
       end
     end
     data = data.gsub(/^(.*),/, '\1 }')
