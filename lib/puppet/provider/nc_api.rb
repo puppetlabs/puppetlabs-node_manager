@@ -18,6 +18,9 @@ require 'openssl'
     when 'POST'
       req      = Net::HTTP::Post.new(rest_endpoint)
       req.body = data
+    when 'PUT'
+      req      = Net::HTTP::Put.new(rest_endpoint)
+      req.body = data
     when 'DELETE'
       req      = Net::HTTP::Delete.new(rest_endpoint)
     else
@@ -31,6 +34,9 @@ require 'openssl'
 
     case resp.code
     when '200','204'
+      resp.body
+    when '201'
+      info "New environment created as #{resp.body}"
       resp.body
     when '303'
       info "New group at #{resp['Location']}"
