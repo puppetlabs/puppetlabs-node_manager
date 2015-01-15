@@ -1,7 +1,6 @@
 class Puppet::Provider::Nc_api < Puppet::Provider
 require 'net/http'
 require 'openssl'
-require 'pry'
 
   def self.rest(method, endpoint, data=false)
 
@@ -49,6 +48,20 @@ require 'pry'
       jresp = JSON.parse(resp.body)
       debug jresp['kind']
     end
-
   end
+
+  def self.data_hash(param_hash, filter=false)
+    # Construct JSON string, not JSON object
+    data = '{ '
+    param_hash.each do |k,v|
+      if !filter or filter.include? k
+        data += "\"#{k}\": "
+        data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
+      end
+    end
+    data = data.gsub(/^(.*),/, '\1 }')
+    debug data
+    data
+  end
+
 end

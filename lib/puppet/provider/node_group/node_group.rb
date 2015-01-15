@@ -55,7 +55,8 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     # Passing an empty hash in the type results in undef
     send_data[:classes] = {} unless send_data[:classes]
 
-    data = self.data_hash(send_data)
+    friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
+    data = Puppet::Provider::Nc_api.data_hash(send_data, friendlies)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
 
     send_data.each_key do |k|
@@ -73,28 +74,13 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
 
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
-      binding.pry
       send_data = {}
       send_data[property] = value
-      data = self.data_hash(send_data)
+      friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
+      data = Puppet::Provider::Nc_api.data_hash(send_data, friendlies)
       Puppet::Provider::Nc_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end
-  end
-
-  def data_hash(param_hash)
-    # Construct JSON string, not JSON object
-    data = '{ '
-    param_hash.each do |k,v|
-      friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
-      if friendlies.include? k
-        data += "\"#{k}\": "
-        data += v.is_a?(String) ? "\"#{v}\"," : "#{v},"
-      end
-    end
-    data = data.gsub(/^(.*),/, '\1 }')
-    debug data
-    data
   end
 
 end
