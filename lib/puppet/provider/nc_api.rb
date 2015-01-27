@@ -45,7 +45,7 @@ require 'openssl'
       info "New environment created as #{resp.body}"
       resp.body
     when '303'
-      info "New group at #{resp['Location']}"
+      info "Added #{resp['Location']} to #{endpoint}"
       resp.body 
     when '422'
       jresp = JSON.parse(resp.body)
