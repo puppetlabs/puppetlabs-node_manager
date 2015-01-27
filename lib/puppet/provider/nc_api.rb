@@ -5,7 +5,11 @@ require 'openssl'
    
   def self.rest(method, endpoint, data=false)
 
-    nc_settings      = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+    begin
+      nc_settings    = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+    rescue
+      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+    end
     rest_endpoint    = "#{nc_settings['prefix']}/v1/#{endpoint}"
     http             = Net::HTTP.new(nc_settings['server'], nc_settings['port'])
     http.use_ssl     = true
