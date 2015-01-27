@@ -1,16 +1,18 @@
 class Puppet::Provider::Nc_api < Puppet::Provider
+require 'yaml'
 require 'net/http'
 require 'openssl'
-
+   
   def self.rest(method, endpoint, data=false)
 
-    rest_endpoint    = "/classifier-api/v1/#{endpoint}"
-    http             = Net::HTTP.new('puppet', 4433)
+    nc_settings      = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+    rest_endpoint    = "#{nc_settings['prefix']}/v1/#{endpoint}"
+    http             = Net::HTTP.new(nc_settings['server'], nc_settings['port'])
     http.use_ssl     = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    http.cert        = OpenSSL::X509::Certificate.new(File.read('/etc/puppetlabs/puppet/ssl/certs/pe-internal-dashboard.pem'))
-    http.key         = OpenSSL::PKey::RSA.new(File.read('/etc/puppetlabs/puppet/ssl/private_keys/pe-internal-dashboard.pem'))
-    http.ca_file     = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
+    http.cert        = OpenSSL::X509::Certificate.new(File.read(Puppet.settings['hostcert']))
+    http.key         = OpenSSL::PKey::RSA.new(File.read(Puppet.settings['hostprivkey']))
+    http.ca_file     = Puppet.settings['localcacert']
 
     case method
     when 'GET'
