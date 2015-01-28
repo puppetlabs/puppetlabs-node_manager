@@ -48,13 +48,13 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
     # Only passing parameters that are given
     send_data = @resource.original_parameters
     # namevar may not be in this hash 
-    send_data[:login] = resource[:name] unless send_data[:login]
+    send_data[:login]        = resource[:name] unless send_data[:login]
     # key changed for usability
-    send_data[:remote] = send_data[:is_remote] if send_data[:is_remote]
+    send_data[:remote]       = send_data[:is_remote] if send_data[:is_remote]
     # key changed for usability
-    send_data[:superuser] = send_data[:is_superuser] if send_data[:is_superuser]
+    send_data[:superuser]    = send_data[:is_superuser] if send_data[:is_superuser]
     # Empty role_id is seen as false
-    send_data[:role_ids] = [] unless send_data[:role_ids]
+    send_data[:role_ids]     = [] unless send_data[:role_ids]
     # Display name is required- fill in with login
     send_data[:display_name] = send_data[:login] unless send_data[:display_name]
 
@@ -70,11 +70,12 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
     exists? ? (return true) : (return false)
   end
 
-  def destroy
-    resp = Puppet::Provider::Nc_api.rest('DELETE', "groups/#{@property_hash[:id]}")
-    @property_hash.clear
-    exists? ? (return false) : (return true)
-  end
+  # DELETE method isn't available thru API yet
+  #def destroy
+  #  resp = Puppet::Provider::Nc_api.rest('DELETE', "groups/#{@property_hash[:id]}")
+  #  @property_hash.clear
+  #  exists? ? (return false) : (return true)
+  #end
 
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
@@ -82,7 +83,7 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
       send_data[property] = value
       friendlies = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
       data = Puppet::Provider::Rbac_api.data_hash(send_data, friendlies)
-      Puppet::Provider::Nc_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
+      Puppet::Provider::Rbac_api.rest('POST', "users/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end
   end
