@@ -1,6 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
-require 'pry'
 
 Puppet::Type.type(:puppet_environment).provide(:puppet_environment, :parent => Puppet::Provider::Nc_api) do
 
@@ -37,7 +36,6 @@ Puppet::Type.type(:puppet_environment).provide(:puppet_environment, :parent => P
   mk_resource_methods
 
   def create
-    binding.pry
     # Only passing parameters that are given
     send_data = @resource.original_parameters
     # namevar may not be in this hash
