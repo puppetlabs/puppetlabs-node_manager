@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'rbac_api'))
 require 'json'
+require 'puppet/provider/helpers'
 
 Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::Rbac_api) do
 
@@ -60,7 +61,7 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
 
     debug send_data
     friendlies = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
-    data = Puppet::Type::Rbac_user::ProviderRbac_user.data_hash(send_data, friendlies)
+    data = Helpers.data_hash(send_data, friendlies)
     resp = Puppet::Type::Rbac_user::ProviderRbac_user.rest('POST', 'users', data)
 
     send_data.each_key do |k|
@@ -82,7 +83,7 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
       send_data = {}
       send_data[property] = value
       friendlies = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
-      data = Puppet::Provider::Rbac_api.data_hash(send_data, friendlies)
+      data = Helpers.data_hash(send_data, friendlies)
       Puppet::Provider::Rbac_api.rest('POST', "users/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end

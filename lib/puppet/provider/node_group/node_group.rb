@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
+require 'puppet/provider/helpers'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
@@ -56,7 +57,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     send_data[:classes] = {} unless send_data[:classes]
 
     friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
-    data = Puppet::Provider::Nc_api.data_hash(send_data, friendlies)
+    data = Helpers.data_hash(send_data, friendlies)
     resp = Puppet::Provider::Nc_api.rest('POST', 'groups', data)
 
     send_data.each_key do |k|
@@ -77,7 +78,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
       send_data = {}
       send_data[property] = value
       friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
-      data = Puppet::Provider::Nc_api.data_hash(send_data, friendlies)
+      data = Helpers.data_hash(send_data, friendlies)
       Puppet::Provider::Nc_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end
