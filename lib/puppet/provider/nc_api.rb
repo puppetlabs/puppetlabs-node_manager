@@ -1,4 +1,5 @@
 class Puppet::Provider::Nc_api < Puppet::Provider
+require 'puppet/provider/helpers'
    
   def self.rest(method, endpoint, data=false)
 
