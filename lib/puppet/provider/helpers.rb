@@ -1,5 +1,3 @@
-require 'puppet'
-
 class Helpers
    
   def self.data_hash(param_hash, filter=false)
