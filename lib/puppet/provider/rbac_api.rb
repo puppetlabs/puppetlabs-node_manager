@@ -1,42 +1,9 @@
 class Puppet::Provider::Rbac_api < Puppet::Provider
-require 'yaml'
-require 'net/http'
-require 'openssl'
+require 'puppet/provider/helpers'
    
   def self.rest(method, endpoint, data=false)
 
-    begin
-      nc_settings    = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-    rescue
-      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
-    end
-    rest_endpoint    = "/rbac-api/v1/#{endpoint}"
-    http             = Net::HTTP.new(nc_settings['server'], nc_settings['port'])
-    http.use_ssl     = true
-    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    http.cert        = OpenSSL::X509::Certificate.new(File.read(Puppet.settings['hostcert']))
-    http.key         = OpenSSL::PKey::RSA.new(File.read(Puppet.settings['hostprivkey']))
-    http.ca_file     = Puppet.settings['localcacert']
-
-    case method
-    when 'GET'
-      req      = Net::HTTP::Get.new(rest_endpoint)
-    when 'POST'
-      req      = Net::HTTP::Post.new(rest_endpoint)
-      req.body = data
-    when 'PUT'
-      req      = Net::HTTP::Put.new(rest_endpoint)
-      req.body = data
-    when 'DELETE'
-      req      = Net::HTTP::Delete.new(rest_endpoint)
-    else
-      fail "#{method} is not a supported method."
-    end
-
-    req['Content-Type'] = 'application/json'
-    resp                = http.request(req)
-
-    debug "Response code #{resp.code}"
+    resp = Helpers.rest_helper(method, endpoint, {'app' => 'rbac-api', 'data' => data})
 
     case resp.code
     when '200','204'
