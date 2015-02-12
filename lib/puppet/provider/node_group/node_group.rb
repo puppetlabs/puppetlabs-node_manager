@@ -1,8 +1,11 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
 require 'puppet/provider/helpers'
+require 'pry'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
+
+  $ngs = []
 
   # API will fail if disallowed-keys are passed
   # Decided to use override_environment instead
@@ -20,11 +23,17 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
   end
 
   def self.instances
-    ngs = JSON.parse(rest('GET', 'groups'))
-    ngs.collect do |group|
+    $ngs = JSON.parse(rest('GET', 'groups'))
+    $ngs.collect do |group|
       ngs_hash = {}
       friendly_name.each do |property,friendly|
-        ngs_hash[friendly.to_sym] = group[property.to_s]
+        # Replace parent ID with string name
+        if friendly == 'parent'
+          gindex = $ngs.index { |i| i['id'] == group[property.to_s] }
+          ngs_hash[friendly.to_sym] = $ngs[gindex]['name']
+        else
+          ngs_hash[friendly.to_sym] = group[property.to_s]
+        end
       end
       ngs_hash[:ensure] = :present
       new(ngs_hash)
@@ -55,6 +64,12 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     send_data[:override_environment] = send_data[:environment_trumps] if send_data[:environment_trumps]
     # Passing an empty hash in the type results in undef
     send_data[:classes] = {} unless send_data[:classes]
+
+    binding.pry
+    if send_data[:parent].is_a?(String)
+      gindex = $ngs.index { |i| i['name'] == send_data[:parent] }
+      send_data[:parent] = $ngs[gindex]['id']
+    end
 
     friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
     data = Helpers.data_hash(send_data, friendlies)
