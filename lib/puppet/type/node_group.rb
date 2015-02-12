@@ -20,16 +20,6 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:parent) do
     desc 'The ID of the parent group'
-    munge do |value|
-      if value.is_a?(String) and value =~ id_format
-        Integer(value)
-      else
-        value
-      end
-    end
-    #validate do |value|
-    #  fail("ID should be numbers and dashes") unless value =~ id_format
-    #end
   end
   newproperty(:variables) do
     desc 'Variables set this group\'s scope'
@@ -60,6 +50,8 @@ Puppet::Type.newtype(:node_group) do
     end
   end
 
-  autorequire(:parent)
+  autorequire(:node_group) do
+    self[:parent] if @parameters.include? :parent
+  end
 
 end
