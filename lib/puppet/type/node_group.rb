@@ -20,9 +20,16 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:parent) do
     desc 'The ID of the parent group'
-    validate do |value|
-      fail("ID should be numbers and dashes") unless value =~ id_format
+    munge do |value|
+      if value.is_a?(String) and value =~ id_format
+        Integer(value)
+      else
+        value
+      end
     end
+    #validate do |value|
+    #  fail("ID should be numbers and dashes") unless value =~ id_format
+    #end
   end
   newproperty(:variables) do
     desc 'Variables set this group\'s scope'
@@ -52,4 +59,7 @@ Puppet::Type.newtype(:node_group) do
       fail("Classes must be supplied as a hash") unless value.is_a?(Hash)
     end
   end
+
+  autorequire(:parent)
+
 end
