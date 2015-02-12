@@ -20,6 +20,7 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:parent) do
     desc 'The ID of the parent group'
+    defaultto :default
   end
   newproperty(:variables) do
     desc 'Variables set this group\'s scope'

@@ -13,7 +13,7 @@ require 'puppet/provider/helpers'
       resp.body
     when '303'
       info "Added #{resp['Location']} to #{endpoint}"
-      resp.body 
+      resp['Location']
     when '422'
       jresp = JSON.parse(resp.body)
       debug_message = "#{jresp['kind']}: "

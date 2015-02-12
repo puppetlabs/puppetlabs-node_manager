@@ -1,7 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'nc_api'))
 require 'json'
 require 'puppet/provider/helpers'
-require 'pry'
 
 Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider::Nc_api) do
 
@@ -65,8 +64,7 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     # Passing an empty hash in the type results in undef
     send_data[:classes] = {} unless send_data[:classes]
 
-    binding.pry
-    if send_data[:parent].is_a?(String)
+    unless send_data[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
       gindex = $ngs.index { |i| i['name'] == send_data[:parent] }
       send_data[:parent] = $ngs[gindex]['id']
     end
@@ -79,6 +77,10 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
       @property_hash[k] = @resource[k]
     end
 
+    # Add placeholder for $ngs lookups
+    id = resp.gsub(/\/classifier-api\/v1\/groups\/(.+)/, '\1')
+    $ngs << { "name" => send_data[:name], "id" => id }
+
     exists? ? (return true) : (return false)
   end
 
@@ -88,6 +90,16 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     exists? ? (return false) : (return true)
   end
 
+  # If ID is given, translate to string name
+  def parent
+    if @resource[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+      gindex = $ngs.index { |i| i['id'] == @resource[:parent] }
+      $ngs[gindex]['id']
+    else
+      @property_hash[:parent]
+    end
+  end
+
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
       send_data = {}
@@ -95,7 +107,12 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
       friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
       data = Helpers.data_hash(send_data, friendlies)
       Puppet::Provider::Nc_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
-      @property_hash[property] = @resource[friendly.to_sym]
+      if value =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+        @property_hash[property] = @resource[friendly.to_sym]
+      else
+        gindex = $ngs.index { |i| i['name'] == value }
+        @property_hash[property] = $ngs[gindex]['id']
+      end
     end
   end
 

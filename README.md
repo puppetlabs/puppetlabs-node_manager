@@ -21,19 +21,21 @@ Create and manage Node Manager API endpoints as resources.
 
 ### Node_group
 
+Node_groups will autorequire parent node_groups.
+
 Enumerate all node groups:
 * `puppet resource node_group`<br />
 
 Example output for `puppet resource node_group default`
 ```
-node_group { 'default':
+node_group { 'PE MCollective':
   ensure               => 'present',
-  classes              => {'profiles::base' => {}},
+  classes              => {'puppet_enterprise::profile::mcollective::agent' => {}},
   environment          => 'production',
-  id                   => '00000000-0000-4000-8000-000000000000',
+  id                   => '4cdec347-20c6-46d7-9658-7189c1537ae9',
   override_environment => 'false',
-  parent               => '00000000-0000-4000-8000-000000000000',
-  rule                 => ['and', ['~', 'name', '.*']],
+  parent               => 'PE Infrastructure',
+  rule                 => ['and', ['~', ['fact', 'pe_version'], '.+']],
 }
 ```
 
@@ -57,7 +59,8 @@ Whether or not this group's environment ment setting overrides
 all other other environments. Default: `false`
 
 * `parent`<br />
-The UID for the data group. Default: ``
+The UID for the data group. Can be specified by group name or
+UID. Default: `default`
 
 * `rules`<br />
 An array of classification rules. Default (empty hash): `{}`
