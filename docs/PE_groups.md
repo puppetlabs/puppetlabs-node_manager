@@ -1,3 +1,5 @@
+Run this through puppet apply to re-create PE groups.  Replace 'master.puppetlabs.vm' with your master hostname as well as any other ports configs, etc.
+```
 node_group { 'PE ActiveMQ Broker':
   ensure               => 'present',
   classes              => {'puppet_enterprise::profile::amq::broker' => {}},
@@ -53,3 +55,4 @@ node_group { 'PE PuppetDB':
   parent               => 'PE Infrastructure',
   rule                 => ['or', ['=', 'name', 'master.puppetlabs.vm']],
 }
+```
