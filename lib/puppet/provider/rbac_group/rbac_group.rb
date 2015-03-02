@@ -59,7 +59,7 @@ Puppet::Type.type(:rbac_group).provide(:rbac_group, :parent => Puppet::Provider:
     friendlies = Puppet::Type::Rbac_group::ProviderRbac_group.friendly_name
     data = Helpers.data_hash(send_data, friendlies)
     binding.pry
-    resp = Puppet::Type::Rbac_group::ProviderRbac_group.rest('POST', 'groups', {'data' => data})
+    resp = Puppet::Type::Rbac_group::ProviderRbac_group.rest('POST', 'groups', data)
 
     send_data.each_key do |k|
       @property_hash[k] = @resource[k]
@@ -81,7 +81,7 @@ Puppet::Type.type(:rbac_group).provide(:rbac_group, :parent => Puppet::Provider:
       send_data[property] = value
       friendlies = Puppet::Type::Rbac_group::ProviderRbac_group.friendly_name
       data = Helpers.data_hash(send_data, friendlies)
-      Puppet::Provider::Rbac_api.rest('POST', "groups/#{@property_hash[:id]}", {'data' => data}) 
+      Puppet::Provider::Rbac_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end
   end
