@@ -26,7 +26,7 @@ Node_groups will autorequire parent node_groups.
 Enumerate all node groups:
 * `puppet resource node_group`<br />
 
-Example output for `puppet resource node_group default`
+Example output for `puppet resource node_group 'PE MCollective'`
 ```
 node_group { 'PE MCollective':
   ensure               => 'present',
