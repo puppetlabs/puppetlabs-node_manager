@@ -64,9 +64,12 @@ Puppet::Type.type(:node_group).provide(:node_group, :parent => Puppet::Provider:
     # Passing an empty hash in the type results in undef
     send_data[:classes] = {} unless send_data[:classes]
 
+    send_data[:parent] = 'default' if !send_data[:parent]
     unless send_data[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
       gindex = $ngs.index { |i| i['name'] == send_data[:parent] }
-      send_data[:parent] = $ngs[gindex]['id']
+      if gindex
+        send_data[:parent] = $ngs[gindex]['id']
+      end
     end
 
     friendlies = Puppet::Type::Node_group::ProviderNode_group.friendly_name
