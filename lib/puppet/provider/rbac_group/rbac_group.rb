@@ -76,11 +76,11 @@ Puppet::Type.type(:rbac_group).provide(:rbac_group, :parent => Puppet::Provider:
   #end
 
   friendly_name.each do |property,friendly|
-    define_method "#{friendly}=" do |value|
-      send_data = {}
-      send_data[property] = value
-      friendlies = Puppet::Type::Rbac_group::ProviderRbac_group.friendly_name
-      data = Helpers.data_hash(send_data, friendlies)
+    define_method "#{friendly} = " do |value|
+      send_data                = {}
+      send_data[property]      = value
+      friendlies               = Puppet::Type::Rbac_group::ProviderRbac_group.friendly_name
+      data                     = Helpers.data_hash(send_data, friendlies)
       Puppet::Provider::Rbac_api.rest('POST', "groups/#{@property_hash[:id]}", data) 
       @property_hash[property] = @resource[friendly.to_sym]
     end
