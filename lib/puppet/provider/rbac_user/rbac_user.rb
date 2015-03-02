@@ -1,5 +1,6 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'rbac_api'))
 require 'json'
+require 'pry'
 
 Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::Rbac_api) do
 
@@ -11,8 +12,11 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
       :login        => 'name',
       :email        => 'email',
       :display_name => 'display_name',
+      :is_group     => 'group',
       :is_remote    => 'remote',
+      :is_revoked   => 'revoked',
       :is_superuser => 'superuser',
+      :last_login   => 'last_login',
       :role_ids     => 'role_ids',
     }
   end
@@ -25,6 +29,7 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
         rbacusers_hash[friendly.to_sym] = user[property.to_s]
       end
       rbacusers_hash[:ensure] = :present
+      rbacusers_hash[:login]  = user['name'] unless user['login']
       new(rbacusers_hash)
     end
   end
@@ -79,12 +84,24 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
 
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
-      send_data = {}
-      send_data[property] = value
-      friendlies = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
-      data = Helpers.data_hash(send_data, friendlies)
+      binding.pry
+      # All these fields are required
+      send_data                = {}
+      send_data[property]      = value
+      send_data[:email]        = @property_hash[:email] || 'admin@host.com'
+      send_data[:last_login]   = @property_hash[:last_login] || ''
+      send_data[:is_revoked]   = @property_hash[:is_revoked] || false
+      send_data[:is_remote]    = @property_hash[:is_remote] || false
+      send_data[:is_superuser] = @property_hash[:is_superuser] || false
+      send_data[:login]        = @property_hash[:login] || @property_hash[:name]
+      send_data[:id]           = @property_hash[:id]
+      send_data[:role_ids]     = @property_hash[:role_ids]
+      send_data[:display_name] = @property_hash[:display_name]
+      send_data[:is_group]     = @property_hash[:is_group] || false
+      friendlies               = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
+      data                     = Helpers.data_hash(send_data, friendlies)
       Puppet::Provider::Rbac_api.rest('PUT', "users/#{@property_hash[:id]}", data) 
-      @property_hash[property] = @resource[friendly.to_sym]
+      @property_hash[property]  = @resource[friendly.to_sym]
     end
   end
 

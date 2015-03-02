@@ -2,6 +2,7 @@ class Helpers
 require 'yaml'
 require 'net/http'
 require 'openssl'
+require 'pry'
    
   def self.rest_helper(method, endpoint, args={})
 
