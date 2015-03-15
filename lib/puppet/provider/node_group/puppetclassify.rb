@@ -1,6 +1,5 @@
 require 'puppetclassify'
 require 'yaml'
-require 'pry'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
