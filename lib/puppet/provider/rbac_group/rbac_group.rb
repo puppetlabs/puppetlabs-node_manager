@@ -1,6 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'rbac_api'))
 require 'json'
-require 'pry'
 
 Puppet::Type.type(:rbac_group).provide(:rbac_group, :parent => Puppet::Provider::Rbac_api) do
 
@@ -58,7 +57,6 @@ Puppet::Type.type(:rbac_group).provide(:rbac_group, :parent => Puppet::Provider:
     debug send_data
     friendlies = Puppet::Type::Rbac_group::ProviderRbac_group.friendly_name
     data = Helpers.data_hash(send_data, friendlies)
-    binding.pry
     resp = Puppet::Type::Rbac_group::ProviderRbac_group.rest('POST', 'groups', data)
 
     send_data.each_key do |k|

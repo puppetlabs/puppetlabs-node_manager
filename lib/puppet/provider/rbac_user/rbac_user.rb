@@ -1,6 +1,5 @@
 require File.expand_path(File.join(File.dirname(__FILE__), '..', 'rbac_api'))
 require 'json'
-require 'pry'
 
 Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::Rbac_api) do
 
@@ -84,7 +83,6 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
 
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
-      binding.pry
       # All these fields are required
       send_data                = {}
       send_data[property]      = value
