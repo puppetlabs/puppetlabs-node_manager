@@ -1,5 +1,6 @@
 require 'puppetclassify'
 require 'yaml'
+require 'pry'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
@@ -54,6 +55,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
           ngs_hash[friendly.to_sym] = group[property.to_s]
         end
       end
+      # Boolean strings converted to syms
+      ngs_hash[:override_environment] = :"#{ngs_hash[:override_environment]}"
       ngs_hash[:ensure] = :present
       new(ngs_hash)
     end
@@ -154,7 +157,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
           @property_flush['attrs'][property.to_s] = value
         end
       end
-      @property_hash[property] = value
+      binding.pry
+      @property_hash[friendly.to_sym] = value
     end
   end
 
