@@ -1,6 +1,5 @@
 require 'puppetclassify'
 require 'yaml'
-require 'pry'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
@@ -157,7 +156,6 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
           @property_flush['attrs'][property.to_s] = value
         end
       end
-      binding.pry
       @property_hash[friendly.to_sym] = value
     end
   end
