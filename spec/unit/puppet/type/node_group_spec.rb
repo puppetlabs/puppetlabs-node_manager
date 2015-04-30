@@ -1,17 +1,20 @@
-require 'spec_helper'
-
-type_class = Puppet::Type.type(:node_group)
-describe type_class do
-
-  before :each do
-    Puppet.settings['localcacert'] = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
-    Puppet.settings['hostcert']    = '/etc/puppetlabs/puppet/ssl/certs/master.puppetlabs.vm.pem'
-    Puppet.settings['hostprivkey'] = '/etc/puppetlabs/puppet/ssl/private_keys/master.puppetlabs.vm.pem'
-  end
+require 'puppet'
+require 'puppet/type/node_group'
+describe Puppet::Type.type(:node_group) do
+  let(:resource) {
+    Puppet::Type.type(:node_group).new(
+      :ensure               => 'present',
+      :classes              => {'puppet_enterprise::profile::mcollective::agent' => {}},
+      :environment          => 'production',
+      :override_environment => 'false',
+      :parent               => 'PE Infrastructure',
+      :rule                 => ['and', ['~', ['fact', 'pe_version'], '.+']]
+    )
+  }
 
   it 'should not accept an id attribute' do
     expect {
-      type_class.new({:name => 'asterix', :id => '1'})
+      type_class[:id] = '1'
     }.to raise_error /ID is read-only/
   end
 
