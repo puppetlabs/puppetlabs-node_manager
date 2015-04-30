@@ -1,9 +1,7 @@
 require 'spec_helper'
 
-describe Puppet::Type do
-  #Puppet.stubs(:settings).with('localcacert').returns('/etc/puppetlabs/puppet/ssl/certs/ca.pem')
-  type_class = Puppet::Type.type(:node_group)
-  describe type_class do
+type_class = Puppet::Type.type(:node_group)
+describe type_class do
 
   before :each do
     Puppet.settings['localcacert'] = '/etc/puppetlabs/puppet/ssl/certs/ca.pem'
@@ -17,5 +15,4 @@ describe Puppet::Type do
     }.to raise_error /ID is read-only/
   end
 
- end
 end
