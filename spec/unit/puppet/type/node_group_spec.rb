@@ -7,6 +7,7 @@ describe Puppet::Type.type(:node_group) do
       :classes              => {'puppet_enterprise::profile::mcollective::agent' => {}},
       :environment          => 'production',
       :override_environment => 'false',
+      :name                 => 'PE MCollective',
       :parent               => 'PE Infrastructure',
       :rule                 => ['and', ['~', ['fact', 'pe_version'], '.+']]
     )
@@ -14,7 +15,7 @@ describe Puppet::Type.type(:node_group) do
 
   it 'should not accept an id attribute' do
     expect {
-      type_class[:id] = '1'
+      resource[:id] = '1'
     }.to raise_error /ID is read-only/
   end
 
