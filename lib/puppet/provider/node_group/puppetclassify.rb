@@ -1,22 +1,30 @@
 require 'puppetclassify'
 require 'yaml'
+require 'pry'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
-  auth_info = {
-    "ca_certificate_path" => Puppet.settings['localcacert'],
-    "certificate_path"    => Puppet.settings['hostcert'],
-    "private_key_path"    => Puppet.settings['hostprivkey'],
-  }
-
-  begin
-    nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-  rescue
-    fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
-  else
-    classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
+  def self.auth_info
+    {
+      "ca_certificate_path" => Puppet.settings['localcacert'],
+      "certificate_path"    => Puppet.settings['hostcert'],
+      "private_key_path"    => Puppet.settings['hostprivkey'],
+    }
   end
-  $puppetclassify = PuppetClassify.new(classifier_url, auth_info)
+
+  def self.nc_settings
+    YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+  rescue
+    raise Puppet::Error, "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+  end
+
+  def self.classifier_url
+    "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
+  end
+
+  def self.puppetclassify
+    PuppetClassify.new(classifier_url, auth_info)
+  end
 
   def initialize(value={})
     super(value)
@@ -42,7 +50,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.instances
-    $ngs = $puppetclassify.groups.get_groups
+    $ngs = puppetclassify.groups.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
       friendly_name.each do |property,friendly|
@@ -97,7 +105,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       end
     end
 
-    resp = $puppetclassify.groups.create_group(send_data)
+    resp = self.class.puppetclassify.groups.create_group(send_data)
     if resp
       send_data.each_key do |k|
         @property_hash[k]       = @resource[k]
@@ -115,7 +123,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def destroy
     begin
-      $puppetclassify.groups.delete_group(@property_hash[:id])
+      self.class.puppetclassify.groups.delete_group(@property_hash[:id])
     rescue Exception => e
       fail(e.message)
       debug(e.backtrace.inspect)
@@ -162,10 +170,10 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def flush
     debug @property_flush['attrs']
-    if @property_flush['attrs']
+    if @property_flush['attrs'].length > 0
       @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
       begin
-        $puppetclassify.groups.update_group(@property_flush['attrs'])
+        self.class.puppetclassify.groups.update_group(@property_flush['attrs'])
       rescue Exception => e
         fail(e.message)
         debug(e.backtrace.inspect)
