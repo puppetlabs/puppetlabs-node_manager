@@ -4,6 +4,7 @@
 ####Table of Contents
 1. [Overview](#overview)
 1. [Requirements] (#requirements)
+1. [Installation](#installation)
 1. [Types] (#types)
   * [Node_group] (#node_group)
   * [Puppet_environment] (#puppet_environment)
@@ -16,6 +17,13 @@ Create and manage Node Manager API endpoints as resources.
 
 - *nix operating system
 - Puppet >= 3.7.1  
+
+## Installation
+puppetversion <=3.7.1
+Puppet module install WhatsARanjit/node_manager
+puppetversion >=3.8.* 
+
+Classify the master or master of masters with node_manager class to correctly install the puppetclassifier gem
 
 ## Types
 
