@@ -26,6 +26,12 @@ Puppet::Type.newtype(:rbac_user) do
       fail("#{name} is not a valid group name") unless value =~ /^[a-zA-Z0-9\-\_'\s]+$/
     end
   end
+  newproperty(:password) do
+    desc 'The user\'s password'
+    validate do |value|
+      fail("#{name} is not a valid group name") unless value =~ /^[a-zA-Z0-9\-\_'\s]+$/
+    end
+  end
   newproperty(:remote) do
     desc ''
     newvalues(:false, :true)
