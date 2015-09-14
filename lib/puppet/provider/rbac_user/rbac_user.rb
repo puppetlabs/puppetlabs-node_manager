@@ -66,7 +66,6 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
     debug send_data
     friendlies = Puppet::Type::Rbac_user::ProviderRbac_user.friendly_name
     data = Helpers.data_hash(send_data, friendlies)
-    puts data.inspect
     resp = Puppet::Type::Rbac_user::ProviderRbac_user.rest('POST', 'users', data)
 
     send_data.each_key do |k|
