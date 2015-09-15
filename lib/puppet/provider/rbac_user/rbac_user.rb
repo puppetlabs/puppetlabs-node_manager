@@ -17,6 +17,7 @@ Puppet::Type.type(:rbac_user).provide(:rbac_user, :parent => Puppet::Provider::R
       :is_superuser => 'superuser',
       :last_login   => 'last_login',
       :role_ids     => 'role_ids',
+      :password     => 'password'
     }
   end
 
