@@ -20,7 +20,7 @@ require 'openssl'
         port   = nc_settings['port']
       end
     when 'rbac-api'
-      server = 'puppet'
+      server = Puppet.settings.setting('certname').value
       port   = '4433'
     end
 
