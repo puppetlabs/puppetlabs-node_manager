@@ -25,6 +25,7 @@ TO DO:
 
 - *nix operating system
 - Puppet >= 3.7.1  
+- [puppetclassify](https://github.com/puppetlabs/puppet-classify) gem
 
 ## Types
 
