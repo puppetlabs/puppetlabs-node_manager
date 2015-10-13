@@ -1,22 +1,7 @@
-require 'puppetclassify'
 require 'yaml'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
-
-  auth_info = {
-    "ca_certificate_path" => Puppet.settings['localcacert'],
-    "certificate_path"    => Puppet.settings['hostcert'],
-    "private_key_path"    => Puppet.settings['hostprivkey'],
-  }
-
-  begin
-    nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-  rescue
-    fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
-  else
-    classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
-  end
-  $puppetclassify = PuppetClassify.new(classifier_url, auth_info)
+  confine :feature => :puppetclassify
 
   def initialize(value={})
     super(value)
@@ -24,6 +9,29 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       'state' => {},
       'attrs' => {},
     }
+  end
+
+
+  def self.classifier
+    @classifier ||= initialize_client
+  end
+
+  def self.initialize_client
+    auth_info = {
+      "ca_certificate_path" => Puppet.settings['localcacert'],
+      "certificate_path"    => Puppet.settings['hostcert'],
+      "private_key_path"    => Puppet.settings['hostprivkey'],
+    }
+
+    begin
+      nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+    rescue
+      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+    else
+      classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
+    end
+
+    PuppetClassify.new(classifier_url, auth_info)
   end
 
   # API will fail if disallowed-keys are passed
@@ -42,7 +50,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.instances
-    $ngs = $puppetclassify.groups.get_groups
+    $ngs = classifier.groups.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
       friendly_name.each do |property,friendly|
@@ -98,7 +106,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       end
     end
 
-    resp = $puppetclassify.groups.create_group(send_data)
+    resp = self.class.classifier.groups.create_group(send_data)
     if resp
       send_data.each_key do |k|
         @property_hash[k]       = @resource[k]
@@ -116,7 +124,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def destroy
     begin
-      $puppetclassify.groups.delete_group(@property_hash[:id])
+      self.class.classifier.groups.delete_group(@property_hash[:id])
     rescue Exception => e
       fail(e.message)
       debug(e.backtrace.inspect)
@@ -167,7 +175,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     if @property_flush['attrs']
       @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
       begin
-        $puppetclassify.groups.update_group(@property_flush['attrs'])
+        self.class.classifier.groups.update_group(@property_flush['attrs'])
       rescue Exception => e
         fail(e.message)
         debug(e.backtrace.inspect)
