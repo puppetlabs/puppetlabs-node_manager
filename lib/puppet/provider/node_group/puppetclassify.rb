@@ -89,12 +89,14 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     # Only passing parameters that are given
     send_data = Hash.new
     @resource.original_parameters.each do |k,v|
-      send_data[k.to_s] = v unless k == :ensure
+      next if k == :ensure
+      key = k.to_s
+      # key changed for usability
+      key = 'environment_trumps' if key == 'override_environment'
+      send_data[key] = v
     end
-    # namevar may not be in this hash 
+    # namevar may not be in this hash
     send_data['name'] = @resource[:name] unless send_data['name']
-    # key changed for usability
-    send_data['override_environment'] = send_data['environment_trumps'] if send_data['environment_trumps']
     # Passing an empty hash in the type results in undef
     send_data['classes'] = {} unless send_data['classes']
 
@@ -108,9 +110,12 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
     resp = self.class.classifier.groups.create_group(send_data)
     if resp
-      send_data.each_key do |k|
-        @property_hash[k]       = @resource[k]
-        @property_hash[:ensure] = :present
+      @resource.original_parameters.each_key do |k|
+        if k == :ensure
+          @property_hash[:ensure] = :present
+        else
+          @property_hash[k]       = @resource[k]
+        end
       end
       # Add placeholder for $ngs lookups
       $ngs << { "name" => send_data[:name], "id" => resp }
