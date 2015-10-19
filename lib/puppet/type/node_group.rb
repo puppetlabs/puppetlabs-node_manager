@@ -5,7 +5,7 @@ Puppet::Type.newtype(:node_group) do
   newparam(:name, :namevar => true) do
     desc 'This is the common name for the node group'
     validate do |value|
-      fail("#{name} is not a valid group name") unless value =~ /^[a-zA-Z0-9\-\_'\s]+$/
+      fail("#{name} is not a valid group name") unless value =~ /^[a-zA-Z0-9:\-\_'\s]+$/
     end
   end
   newproperty(:id) do
