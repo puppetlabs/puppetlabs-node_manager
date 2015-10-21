@@ -17,10 +17,6 @@ Create and manage Node Manager API endpoints as resources.
 NOTE: This module is a Professional Service side project and is currently unmaintained. 
 It is not supported and may not function as expected.
 
-TO DO:
-
-1. Convert provider to use puppet-classify
-
 ## Requirements:
 
 - *nix operating system
