@@ -4,7 +4,7 @@ Puppet::Type.newtype(:puppet_environment) do
   newparam(:name, :namevar => true) do
     desc 'This is the name of the environment'
     validate do |value|
-      fail("#{name} is not a valid group name") unless value =~ /^[a-zA-Z0-9\-\_'\s]+$/
+      fail("#{value} is not a valid group name") unless value =~ /\A[a-z0-9_]+\Z/
     end
   end
 end
