@@ -35,7 +35,7 @@ Puppet::Type.newtype(:node_group) do
     desc 'Environment for this group'
     defaultto :production
     validate do |value|
-      fail("Invalid environment name") unless value =~ /^[a-z][a-z0-9]+$/
+      fail("Invalid environment name") unless value =~ /^[a-z][a-z0-9_]+$/
     end
   end
   newproperty(:classes) do
