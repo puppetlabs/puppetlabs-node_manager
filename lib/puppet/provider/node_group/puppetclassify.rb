@@ -1,3 +1,4 @@
+require 'puppet/util/node_groups'
 require 'yaml'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
@@ -17,21 +18,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.initialize_client
-    auth_info = {
-      "ca_certificate_path" => Puppet.settings['localcacert'],
-      "certificate_path"    => Puppet.settings['hostcert'],
-      "private_key_path"    => Puppet.settings['hostprivkey'],
-    }
-
-    begin
-      nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-    rescue
-      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
-    else
-      classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
-    end
-
-    PuppetClassify.new(classifier_url, auth_info)
+    Puppet::Util::Node_groups.new
   end
 
   # API will fail if disallowed-keys are passed

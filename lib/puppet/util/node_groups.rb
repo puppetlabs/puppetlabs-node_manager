@@ -1,8 +1,9 @@
 require 'puppetclassify'
 require 'yaml'
 
-class Puppet::Util::Node_groups
+class Puppet::Util::Node_groups < PuppetClassify
   attr_reader :groups
+  alias_method :groups, :groups
 
   def initialize
     auth_info = {
@@ -20,7 +21,7 @@ class Puppet::Util::Node_groups
     end
 
     ng      = PuppetClassify.new(classifier_url, auth_info)
-    @groups = ng.groups.get_groups
+    @groups = ng.groups
   end
 
   # Transform the node group array in to a hash

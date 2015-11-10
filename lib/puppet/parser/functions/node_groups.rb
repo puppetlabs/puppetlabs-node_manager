@@ -9,7 +9,7 @@ module Puppet::Parser::Functions
     )
 
     ng     = Puppet::Util::Node_groups.new
-    groups = ng.groups
+    groups = ng.groups.get_groups
 
     # When querying a specific group
     if args.length == 1
