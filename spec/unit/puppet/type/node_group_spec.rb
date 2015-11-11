@@ -38,6 +38,15 @@ describe Puppet::Type.type(:node_group) do
     }.to_not raise_error
   end
 
+  it "should allow environment name 'agent-specified'" do
+    expect {
+      Puppet::Type.type(:node_group).new(
+        :name        => 'stubname',
+        :environment => 'agent-specified',
+      )
+    }.to_not raise_error
+  end
+
   it "should not allow environment name with a dash" do
     expect {
       Puppet::Type.type(:node_group).new(
