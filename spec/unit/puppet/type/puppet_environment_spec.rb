@@ -39,7 +39,7 @@ describe Puppet::Type.type(:puppet_environment) do
       Puppet::Type.type(:puppet_environment).new(
         :name => 'not-a-valid-name',
       )
-    }.to raise_error(/not-a-valid-name is not a valid group name/)
+    }.to raise_error(/not-a-valid-name is not a valid environment name/)
   end
 
 
