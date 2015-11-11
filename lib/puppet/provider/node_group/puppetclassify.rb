@@ -77,6 +77,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     send_data = Hash.new
     @resource.original_parameters.each do |k,v|
       next if k == :ensure
+      next if @resource.parameter(k).metaparam?
       key = k.to_s
       # key changed for usability
       key = 'environment_trumps' if key == 'override_environment'
