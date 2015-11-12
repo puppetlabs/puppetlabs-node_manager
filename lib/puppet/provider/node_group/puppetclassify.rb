@@ -116,6 +116,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def destroy
+    @noflush = true
     begin
       self.class.classifier.groups.delete_group(@property_hash[:id])
     rescue Exception => e
