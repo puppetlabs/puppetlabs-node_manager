@@ -1,12 +1,14 @@
 
-#node_manager
+# node_manager
 
-####Table of Contents
+#### Table of Contents
 1. [Overview](#overview)
 1. [Requirements] (#requirements)
 1. [Types] (#types)
   * [Node_group] (#node_group)
   * [Puppet_environment] (#puppet_environment)
+1. [Functions] (#functions)
+  * [node_groups()] (#node_groups)
 
 ## Overview
 
@@ -39,13 +41,13 @@ node_group { 'PE MCollective':
   classes              => {'puppet_enterprise::profile::mcollective::agent' => {}},
   environment          => 'production',
   id                   => '4cdec347-20c6-46d7-9658-7189c1537ae9',
-  override_environment => false,
+  override_environment => 'false',
   parent               => 'PE Infrastructure',
   rule                 => ['and', ['~', ['fact', 'pe_version'], '.+']],
 }
 ```
 
-### Node_group parameters
+#### Node_group parameters
 
 * `classes`<br />
 Classes that are assigned to the node in hash format.  Elements of the hash
@@ -82,7 +84,57 @@ puppet_environment { 'production':
   ensure => 'present',
 }
 ```
-### Puppet_environment parameters
+#### Puppet_environment parameters
 
 * `name`<br />
 (namevar) Name of the Puppet environment on disk, i.e. the directory name in `$environmentpath`.
+
+## Functions
+
+### node_groups()
+
+Retrieve all or one node_group and its data.
+
+`node_groups()` will return:
+
+```
+{
+  "default"=>{
+    "environment_trumps"=>false,
+    "parent"=>"00000000-0000-4000-8000-000000000000",
+    "name"=>"default",
+    "rule"=>["and", ["~", "name", ".*"]],
+    "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
+    "environment"=>"production",
+    "classes"=>{}
+  },
+  "Production environment"=>{
+    "environment_trumps"=>false,
+    "parent"=>"00000000-0000-4000-8000-000000000000",
+    "name"=>"Production environment",
+    "rule"=>["and", ["~", "name", ".*"]],
+    "variables"=>{},
+    "id"=>"7233f964-951e-4a7f-88ea-72676ed3104d",
+    "environment"=>"production",
+    "classes"=>{}
+  },
+  ...
+}
+```
+
+`node_groups('default')` will return:
+
+```
+{
+  "default"=>{
+    "environment_trumps"=>false,
+    "parent"=>"00000000-0000-4000-8000-000000000000",
+    "name"=>"default",
+    "rule"=>["and", ["~", "name", ".*"]],
+    "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
+    "environment"=>"production",
+    "classes"=>{}
+  }
+  ```
+
+_Type:_ rvalue
