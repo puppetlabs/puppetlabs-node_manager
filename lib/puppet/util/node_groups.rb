@@ -1,7 +1,17 @@
-require 'puppetclassify'
-require 'yaml'
+# The provider is loaded both by the master and by the agent. Only the agent
+# will actually need the puppetclassify gem and methods. In order to allow
+# seamless loading by the masteror during compilation prior to enforcing state,
+# allow graceful failure when unable to load puppetclassify.
 
-class Puppet::Util::Node_groups < PuppetClassify
+begin
+  require 'yaml'
+  require 'puppetclassify'
+  parent = PuppetClassify
+rescue LoadError => e
+  parent = Object
+end
+
+class Puppet::Util::Node_groups < parent
   attr_reader :groups
   alias_method :groups, :groups
 
