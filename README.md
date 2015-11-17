@@ -1,5 +1,4 @@
-
-# node_manager
+# node_manager [![Build Status](https://travis-ci.org/puppetlabs/prosvcs-node_manager.svg)](https://travis-ci.org/puppetlabs/prosvcs-node_manager)
 
 #### Table of Contents
 1. [Overview](#overview)
@@ -71,7 +70,7 @@ The UID for the data group. Can be specified by group name or
 UID. Default: `default`
 
 * `rules`<br />
-An array of classification rules. Default (empty hash): `{}`
+An array of classification rules. Default (empty array): `[]`
 
 ### Puppet_environment
 
@@ -135,6 +134,7 @@ Retrieve all or one node_group and its data.
     "environment"=>"production",
     "classes"=>{}
   }
+}
   ```
 
 _Type:_ rvalue
