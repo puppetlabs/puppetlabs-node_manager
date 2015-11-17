@@ -12,8 +12,9 @@ rescue LoadError => e
 end
 
 class Puppet::Util::Node_groups < parent
-  attr_reader :groups
+  attr_reader :groups, :environments
   alias_method :groups, :groups
+  alias_method :environments, :environments
 
   def initialize
     auth_info = {
@@ -30,8 +31,14 @@ class Puppet::Util::Node_groups < parent
       classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
     end
 
-    ng      = PuppetClassify.new(classifier_url, auth_info)
-    @groups = ng.groups
+    ng            = PuppetClassify.new(classifier_url, auth_info)
+    @groups       = ng.groups
+    @environments = ng.environments
+
+    # Add in for delete_environment method.
+    # See below.
+    @auth_info    = auth_info
+    @nc_api_url   = classifier_url
   end
 
   # Transform the node group array in to a hash
@@ -45,5 +52,18 @@ class Puppet::Util::Node_groups < parent
     end
 
     hashified
+  end
+
+  # puppetclassify does not currently have a
+  # method to delete environments.  Using this
+  # in the meantime.
+  def delete_environment(name)
+    puppet_https = PuppetHttps.new(@auth_info)
+    env_res = puppet_https.delete("#{@nc_api_url}/v1/environments/#{name}")
+
+    unless env_res.code.to_i == 204
+      STDERR.puts "An error occured saving the environment: HTTP #{env_res.code} #{env_res.message}"
+      STDERR.puts env_res.body
+    end
   end
 end
