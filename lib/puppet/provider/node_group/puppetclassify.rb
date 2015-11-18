@@ -1,5 +1,4 @@
 require 'puppet/util/node_groups'
-require 'yaml'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
   confine :feature => :puppetclassify
@@ -43,7 +42,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       friendly_name.each do |property,friendly|
         # Replace parent ID with string name
         if friendly == 'parent'
-          gindex = $ngs.index { |i| i['id'] == group[property.to_s] }
+          gindex = get_name_index_from_id(group[property.to_s])
           ngs_hash[friendly.to_sym] = $ngs[gindex]['name']
         else
           ngs_hash[friendly.to_sym] = group[property.to_s]
@@ -88,9 +87,9 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     # Passing an empty hash in the type results in undef
     send_data['classes'] = {} unless send_data['classes']
 
-    send_data['parent'] = 'default' if !send_data['parent']
+    send_data['parent'] = '00000000-0000-4000-8000-000000000000' if !send_data['parent']
     unless send_data['parent'] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
-      gindex = $ngs.index { |i| i['name'] == send_data['parent'] }
+      gindex = get_id_index_from_name(send_data['parent'])
       if gindex
         send_data['parent'] = $ngs[gindex]['id']
       end
@@ -131,8 +130,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   # If ID is given, translate to string name
   def parent
     if @resource[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
-      gindex = $ngs.index { |i| i['id'] == @resource[:parent] }
-      $ngs[gindex]['id']
+      gindex = self.class.get_name_index_from_id(@resource[:parent])
+      $ngs[gindex]['name']
     else
       @property_hash[:parent]
     end
@@ -176,6 +175,16 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       else
       end
     end
+  end
+
+  private
+
+  def self.get_name_index_from_id(id)
+    $ngs.index { |i| i['id'] == id }
+  end
+
+  def get_id_index_from_name(name)
+    $ngs.index { |i| i['name'] == name }
   end
 
 end
