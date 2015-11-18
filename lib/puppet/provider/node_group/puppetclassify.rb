@@ -87,7 +87,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     # Passing an empty hash in the type results in undef
     send_data['classes'] = {} unless send_data['classes']
 
-    send_data['parent'] = 'default' if !send_data['parent']
+    send_data['parent'] = '00000000-0000-4000-8000-000000000000' if !send_data['parent']
     unless send_data['parent'] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
       gindex = get_id_index_from_name(send_data['parent'])
       if gindex
