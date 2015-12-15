@@ -3,6 +3,7 @@
 #### Table of Contents
 1. [Overview](#overview)
 1. [Requirements] (#requirements)
+1. [Installation](#installation)
 1. [Types] (#types)
   * [Node_group] (#node_group)
   * [Puppet_environment] (#puppet_environment)
@@ -23,6 +24,13 @@ It is not supported and may not function as expected.
 - *nix operating system
 - Puppet >= 3.7.1  
 - [puppetclassify](https://github.com/puppetlabs/puppet-classify) gem
+
+## Installation
+puppetversion <=3.7.1
+Puppet module install WhatsARanjit/node_manager
+puppetversion >=3.8.* 
+
+Classify the master or master of masters with node_manager class to correctly install the puppetclassifier gem
 
 ## Types
 
