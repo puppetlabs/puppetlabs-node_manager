@@ -4,7 +4,10 @@ group :test do
   gem "rake"
   gem "puppet", ENV['PUPPET_VERSION'] || '~> 3.7.3'
   gem "rspec-puppet", :git => 'https://github.com/rodjek/rspec-puppet.git'
-  gem "puppetlabs_spec_helper"
+  gem 'puppet', nil || ENV['PUPPET_VERSION']
+  gem 'puppetlabs_spec_helper', '0.10.3'
+  gem 'webmock', '1.22.1'
+  gem 'puppetclassify', '0.1.0'
   gem 'rspec-puppet-utils', :git => 'https://github.com/Accuity/rspec-puppet-utils.git'
   gem 'hiera-puppet-helper', :git => 'https://github.com/bobtfish/hiera-puppet-helper.git'
   # there seems to be a bug with puppet-blacksmith and metadata-json-lint
@@ -20,4 +23,6 @@ group :development do
   gem "puppet-blacksmith"
   gem "guard-rake"
 end
+
+
 
