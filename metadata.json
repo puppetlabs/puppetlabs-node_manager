@@ -7,7 +7,9 @@
   "source": "https://github.com/puppetlabs/prosvcs-node_manager",
   "project_page": "https://github.com/puppetlabs/prosvcs-node_manager",
   "issues_url": "https://github.com/puppetlabs/prosvcs-node_manager/issues",
-  "dependencies": [ ],
+  "dependencies": [ 
+    {"name":"puppetlabs/pe_gem","version_requirement":"0.1.2"}
+  ],
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
