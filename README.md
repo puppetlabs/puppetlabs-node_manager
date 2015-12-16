@@ -23,6 +23,12 @@ It is not supported and may not function as expected.
 - *nix operating system
 - Puppet >= 3.7.1  
 - [puppetclassify](https://github.com/puppetlabs/puppet-classify) gem
+- [puppetlabs/pe_gem module](https://forge.puppetlabs.com/puppetlabs/pe_gem)
+
+## Classes
+### Node_manager
+The node_manager class facilitates the deployment of the puppetclassify gem
+simply include node_manager in your node definition or add it to the pe_master node group
 
 ## Types
 
