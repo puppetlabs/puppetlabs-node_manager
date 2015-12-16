@@ -105,7 +105,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
         end
       end
       # Add placeholder for $ngs lookups
-      $ngs << { "name" => send_data[:name], "id" => resp }
+      $ngs << { "name" => send_data['name'], "id" => resp }
     else
       fail("puppetclassify was not able to create group")
     end
