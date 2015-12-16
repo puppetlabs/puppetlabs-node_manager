@@ -4,9 +4,10 @@ class node_manager::puppetclassify::install(
 $gemprovider = $node_manager::params::gemprovider
 
   package { 'puppetclassify':
-    ensure => present,
+    ensure => $version,
     provider  => $gemprovider,
+
   }
 }
 
-}
+
