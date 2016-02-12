@@ -4,7 +4,7 @@ class node_manager::puppetclassify::install(
 ) inherits node_manager::params {
 
   package { 'puppetclassify':
-    ensure => $version,
+    ensure    => $version,
     provider  => $gemprovider,
 
   }
