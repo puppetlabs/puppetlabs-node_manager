@@ -1,5 +1,5 @@
 class node_manager::params {
-  $version = '0.1.2' #puppetclassify gem version
+  $version = '0.1.3' #puppetclassify gem version
 
   if "$::puppetversion" =~ /3.8/ {
     $gemprovider='pe_gem'
