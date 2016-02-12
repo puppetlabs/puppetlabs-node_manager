@@ -24,7 +24,7 @@ describe 'node_manager::puppetclassify::install' do
     # while all required parameters will require you to add a value
     let(:params) do
       {
-        #:version => 0.1.2,
+        #:version => 0.1.3,
         #:node_manager:params::gemprovider => pe_gem
       }
     end
@@ -33,7 +33,7 @@ describe 'node_manager::puppetclassify::install' do
     # Puppet::Util::Log.newdestination(:console)
     it do
       should contain_package('puppetclassify').with({
-        "ensure"=>"0.1.2",
+        "ensure"=>"0.1.3",
         "provider"=>"pe_gem",
         })
     end
@@ -50,7 +50,7 @@ describe 'node_manager::puppetclassify::install' do
     # while all required parameters will require you to add a value
     let(:params) do
       {
-        #:version => 0.1.2,
+        #:version => 0.1.3,
         #:node_manager:params::gemprovider => puppet_gem
       }
     end
@@ -59,7 +59,7 @@ describe 'node_manager::puppetclassify::install' do
     # Puppet::Util::Log.newdestination(:console)
     it do
       should contain_package('puppetclassify').with({
-        "ensure"=>"0.1.2",
+        "ensure"=>"0.1.3",
         "provider"=>"puppet_gem",
         })
     end
