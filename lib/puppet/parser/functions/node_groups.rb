@@ -1,4 +1,9 @@
-require 'puppet/util/node_groups'
+begin
+  require 'puppet/util/node_groups'
+rescue LoadError
+  mod = Puppet::Module.find('node_manager', Puppet[:environment].to_s)
+  require File.join mod.path, 'lib/puppet/util/node_groups'
+end
 
 module Puppet::Parser::Functions
   newfunction(:node_groups, :type => :rvalue) do |args|
