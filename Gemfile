@@ -13,6 +13,7 @@ group :test do
   gem 'puppet-syntax'
   gem 'puppet-lint'
   gem 'listen', '<= 3.0.8'
+  gem 'net-http-persistent', '~> 2.9.4'
 end
 
 group :development do
