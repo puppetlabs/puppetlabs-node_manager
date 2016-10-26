@@ -12,6 +12,7 @@ group :test do
   gem "metadata-json-lint"
   gem 'puppet-syntax'
   gem 'puppet-lint'
+  gem 'listen', '<= 3.0.8'
 end
 
 group :development do
