@@ -42,6 +42,7 @@ describe 'node_manager::puppetclassify::install' do
   context 'When installed on PE 2015.2' do
     let(:facts) do
       {
+        :puppetversion => false,
         :pe_server_version => '2015.2'
       }
     end
