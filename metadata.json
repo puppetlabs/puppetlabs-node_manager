@@ -1,6 +1,6 @@
 {
   "name": "WhatsARanjit-node_manager",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "author": "WhatsARanjit",
   "summary": "Create and manage Node Manager API endpoints as resources.",
   "license": "Apache 2.0",
