@@ -22,6 +22,7 @@ class Puppet::Util::Node_groups < parent
 
     begin
       nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+      nc_settings = nc_settings.first if nc_settings.class == Array            
     rescue
       fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
     else
