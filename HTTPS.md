@@ -3,34 +3,32 @@
 #### Table of Contents
 1. [Overview](#overview)
 1. [Requirements](#requirements)
-1. [Types](#types)
-    * [Node_group](#node_group)
-    * [Puppet_environment](#puppet_environment)
-1. [Functions](#functions)
-    * [node_groups()](#node_groups)
-1. [Things to do](#things-to-do)
+1. [node_group type](#node_group)
+1. [node_groups() function](#node_groups)
 
 ## Overview
 
-Create and manage Node Manager API endpoints as resources.
+Create and manage PE Console node groups as resources.
+The `https` provider is meant to erase the dependecy on
+the `puppetclassify` gem  This helps will runtime issues
+when managing node_groups and installing the gem in the
+same agent run.  To try it out:
 
-## Module State
+```
+node_group { 'Test new provider':
+  ensure   => present,
+  provider => 'https',
+}
+```
 
-NOTE: This module is a Professional Service side project and is currently unmaintained. 
-It is not supported and may not function as expected.
+No changes need to be made.  When the `puppetclassify`
+provider is dropped, the `https` provider will take over
+as a seamless swap-in.
 
 ## Requirements:
 
 - *nix operating system
-- Puppet >= 3.7.1  
-- [puppetclassify](https://github.com/puppetlabs/puppet-classify) gem
-- [puppetlabs/pe_gem module](https://forge.puppetlabs.com/puppetlabs/pe_gem)
-- NOTE: new `https` provider which doesn't need gem dependency at [HTTPS.md](HTTPS.md)
-
-## Classes
-### Node_manager
-The node_manager class facilitates the deployment of the puppetclassify gem
-simply include node_manager in your node definition or add it to the pe_master node group
+- Puppet Enterprise >= 3.7.1  
 
 ## Types
 
@@ -75,26 +73,10 @@ all other other environments. Default: `false`
 
 * `parent`<br />
 The UID for the data group. Can be specified by group name or
-UID. Default: `default`
+UID. Default: `All Nodes`
 
 * `rules`<br />
 An array of classification rules. Default (empty array): `[]`
-
-### Puppet_environment
-
-Enumerate all puppet environments:
-* `puppet resource puppet_environment`<br />
-
-Example output for `puppet resource puppet_environment production`
-```
-puppet_environment { 'production':
-  ensure => 'present',
-}
-```
-#### Puppet_environment parameters
-
-* `name`<br />
-(namevar) Name of the Puppet environment on disk, i.e. the directory name in `$environmentpath`.
 
 ## Functions
 
@@ -106,10 +88,10 @@ Retrieve all or one node_group and its data.
 
 ```
 {
-  "default"=>{
+  "All Nodes"=>{
     "environment_trumps"=>false,
     "parent"=>"00000000-0000-4000-8000-000000000000",
-    "name"=>"default",
+    "name"=>"All Nodes",
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
@@ -129,14 +111,14 @@ Retrieve all or one node_group and its data.
 }
 ```
 
-`node_groups('default')` will return:
+`node_groups('All Nodes')` will return:
 
 ```
 {
-  "default"=>{
+  "All Nodes"=>{
     "environment_trumps"=>false,
     "parent"=>"00000000-0000-4000-8000-000000000000",
-    "name"=>"default",
+    "name"=>"All Nodes",
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
@@ -146,10 +128,6 @@ Retrieve all or one node_group and its data.
   ```
 
 _Type:_ rvalue
-
-## Things to do
-  - Remove `puppetclassify` dependency
-  - Get feedback on `https` provider, new [HTTPS.md](HTTPS.md)
 
 ## Maintainers
 This repositority is largely the work of some Puppet community members.

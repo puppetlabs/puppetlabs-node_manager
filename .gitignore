@@ -4,3 +4,4 @@ spec/fixtures/
 pkg/*
 *.travis*
 *.old
+checksums.json

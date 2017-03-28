@@ -1,12 +1,12 @@
 {
   "name": "WhatsARanjit-node_manager",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "author": "WhatsARanjit",
-  "summary": "Create and manage Node Manager API endpoints as resources.",
-  "license": "Apache 2.0",
-  "source": "https://github.com/puppetlabs/prosvcs-node_manager",
-  "project_page": "https://github.com/puppetlabs/prosvcs-node_manager",
-  "issues_url": "https://github.com/puppetlabs/prosvcs-node_manager/issues",
+  "summary": "Create and manage PE Console node groups as resources.",
+  "license": "Apache-2.0",
+  "source": "https://github.com/WhatsARanjit/prosvcs-node_manager",
+  "project_page": "https://github.com/WhatsARanjit/prosvcs-node_manager",
+  "issues_url": "https://github.com/WhatsARanjit/prosvcs-node_manager/issues",
   "dependencies": [ 
     {"name":"puppetlabs/pe_gem","version_requirement":"0.1.2"}
   ],

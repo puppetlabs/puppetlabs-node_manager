@@ -1,7 +1,7 @@
 require 'puppetlabs_spec_helper/module_spec_helper'
 require 'webmock/rspec'
 
-describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
+describe Puppet::Type.type(:node_group).provider(:https) do
 
   GROUPS_RESPONSE = <<-EOS
   [
@@ -25,13 +25,12 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
   ]
   EOS
 
-  CREATE_REQUEST = {
+  HCREATE_REQUEST = {
     "environment_trumps" => "false",
     "parent"             => "00000000-0000-4000-8000-000000000000",
     "rule"               => ["or", ["=", "name", "master.puppetlabs.vm"]],
     "environment"        => "stubenvironment",
     "classes"            => {"puppet_enterprise::profile::amq::broker" => {}},
-    "provider"           => "puppetclassify",
     "variables"          => {
       "stubkey"  => "stubvalue",
       "stubkey2" => "stubvalue2"
@@ -47,7 +46,7 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
       :rule                 => ['or', ['=', 'name', 'master.puppetlabs.vm']],
       :environment          => 'stubenvironment',
       :classes              => {'puppet_enterprise::profile::amq::broker' => {}},
-      :provider             => 'puppetclassify',
+      :provider             => 'https',
       :variables            => {
         :stubkey  => :stubvalue,
         :stubkey2 => :stubvalue2,
@@ -78,7 +77,7 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
       stub_request(:post, "https://stubserver:8080/classifier-api/v1/groups")
         .to_return(:status => 303, :headers => {:location => "/classifier-api/v1/groups/stubid"})
       subject.provider.create
-      assert_requested(:post, "https://stubserver:8080/classifier-api/v1/groups", :body => CREATE_REQUEST)
+      assert_requested(:post, "https://stubserver:8080/classifier-api/v1/groups", :body => HCREATE_REQUEST)
     end
   end
 
