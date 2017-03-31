@@ -1,3 +1,14 @@
+## 2017-03-31 - Release 0.4.1
+
+### Summary
+
+- Added `description` attribute to groups
+
+#### Bugfixes
+
+- Added logic for cancelling unwanted classes/variables
+- Able to now submit empty class/variables values
+
 ## 2017-03-30 - Release 0.4.0
 
 ### Summary
