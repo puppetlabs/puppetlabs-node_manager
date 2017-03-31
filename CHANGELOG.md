@@ -1,3 +1,10 @@
+## 2017-03-30 - Release 0.4.0
+
+### Summary
+
+- Added `https` provider which doesn't need `puppeclassify` gem
+- Added deprecation notice for `puppetclassify` provider
+
 ## 2016-10-26 - Release 0.3.0
 ### Summary
 

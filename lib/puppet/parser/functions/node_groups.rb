@@ -1,8 +1,8 @@
 begin
-  require 'puppet/util/node_groups'
+  require 'puppet/util/nc_https'
 rescue LoadError
   mod = Puppet::Module.find('node_manager', Puppet[:environment].to_s)
-  require File.join mod.path, 'lib/puppet/util/node_groups'
+  require File.join mod.path, 'lib/puppet/util/nc_https'
 end
 
 module Puppet::Parser::Functions
@@ -13,17 +13,17 @@ module Puppet::Parser::Functions
       ( args.length == 1 and node_name.is_a?(String) )
     )
 
-    ng     = Puppet::Util::Node_groups.new
-    groups = ng.groups.get_groups
+    ng     = Puppet::Util::Nc_https.new
+    groups = ng.get_groups
 
     # When querying a specific group
     if args.length == 1
       # Assuming there is only one group by the name
-      Puppet::Util::Node_groups.hashify_group_array(
+      Puppet::Util::Nc_https.hashify_group_array(
         groups.select { |g| g['name'] == node_name }
       )
     else
-      Puppet::Util::Node_groups.hashify_group_array(groups)
+      Puppet::Util::Nc_https.hashify_group_array(groups)
     end
   end
 end

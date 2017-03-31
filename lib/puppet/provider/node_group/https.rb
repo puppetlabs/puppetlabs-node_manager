@@ -1,7 +1,6 @@
-require 'puppet/util/node_groups'
+require 'puppet/util/nc_https'
 
-Puppet::Type.type(:node_group).provide(:puppetclassify) do
-  confine :feature => :puppetclassify
+Puppet::Type.type(:node_group).provide(:https) do
 
   def initialize(value={})
     super(value)
@@ -17,7 +16,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.initialize_client
-    Puppet::Util::Node_groups.new
+    Puppet::Util::Nc_https.new
   end
 
   # API will fail if disallowed-keys are passed
@@ -36,8 +35,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.instances
-    deprecation_warning('This provider is being deprecated.  See https provider at https://github.com/WhatsARanjit/prosvcs-node_manager/blob/https_provider/HTTPS.md')
-    $ngs = classifier.groups.get_groups
+    $ngs = classifier.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
       friendly_name.each do |property,friendly|
@@ -76,7 +74,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     # Only passing parameters that are given
     send_data = Hash.new
     @resource.original_parameters.each do |k,v|
-      next if k == :ensure
+      next if [:ensure, :provider].include? k
       next if @resource.parameter(k).metaparam?
       key = k.to_s
       # key changed for usability
@@ -96,20 +94,16 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       end
     end
 
-    resp = self.class.classifier.groups.create_group(send_data)
-    if resp
-      @resource.original_parameters.each_key do |k|
-        if k == :ensure
-          @property_hash[:ensure] = :present
-        else
-          @property_hash[k]       = @resource[k]
-        end
+    resp = self.class.classifier.create_group(send_data)
+    @resource.original_parameters.each_key do |k|
+      if k == :ensure
+        @property_hash[:ensure] = :present
+      else
+        @property_hash[k]       = @resource[k]
       end
-      # Add placeholder for $ngs lookups
-      $ngs << { "name" => send_data['name'], "id" => resp }
-    else
-      fail("puppetclassify was not able to create group")
     end
+    # Add placeholder for $ngs lookups
+    $ngs << { "name" => send_data['name'], "id" => resp }
 
     exists? ? (return true) : (return false)
 
@@ -117,14 +111,9 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def destroy
     @noflush = true
-    begin
-      self.class.classifier.groups.delete_group(@property_hash[:id])
-    rescue Exception => e
-      fail(e.message)
-      debug(e.backtrace.inspect)
-    else
-      @property_hash.clear
-    end
+    self.class.classifier.delete_group(@property_hash[:id])
+    @property_hash.clear
+
     exists? ? (return false) : (return true)
   end
 
@@ -165,16 +154,10 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def flush
     return if @noflush
-    debug @property_flush['attrs']
+    Puppet.debug @property_flush['attrs']
     if @property_flush['attrs']
       @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
-      begin
-        self.class.classifier.groups.update_group(@property_flush['attrs'])
-      rescue Exception => e
-        fail(e.message)
-        debug(e.backtrace.inspect)
-      else
-      end
+      self.class.classifier.update_group(@property_flush['attrs'])
     end
   end
 
