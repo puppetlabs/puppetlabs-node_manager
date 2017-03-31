@@ -148,6 +148,11 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
           gindex = $ngs.index { |i| i['name'] == value }
           @property_flush['attrs'][property.to_s] = $ngs[gindex]['id']
         end
+      # These 2 attributes are additive, so need to submit nulls to remove unwanted values
+      elsif [:variables, :classes].include?(property)
+        @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[property], value)
+        # For logging return to original intended value
+        @resource[property] = value.select { |k,v| v != nil }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
@@ -187,6 +192,13 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def get_id_index_from_name(name)
     $ngs.index { |i| i['name'] == name }
+  end
+
+  def add_nulls(current, new)
+    difference = current.keys - new.keys
+    nullhash   = new
+    difference.each { |k| nullhash[k] = nil }
+    nullhash
   end
 
 end
