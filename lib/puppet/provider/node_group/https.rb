@@ -30,7 +30,8 @@ Puppet::Type.type(:node_group).provide(:https) do
       :name               => 'name',
       :parent             => 'parent',
       :rule               => 'rule',
-      :variables          => 'variables'
+      :variables          => 'variables',
+      :description        => 'description',
     }
   end
 

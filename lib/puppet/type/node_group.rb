@@ -40,6 +40,9 @@ Puppet::Type.newtype(:node_group) do
       fail("Classes must be supplied as a hash") unless value.is_a?(Hash)
     end
   end
+  newproperty(:description) do
+    desc 'Description of this group'
+  end
 
   autorequire(:node_group) do
     self[:parent] if @parameters.include? :parent

@@ -64,4 +64,13 @@ describe Puppet::Type.type(:node_group) do
     }.to_not raise_error
   end
 
+  it "should accept a description parameter" do
+    expect {
+      Puppet::Type.type(:node_group).new(
+        :name        => 'stubname',
+        :description => 'Sample message',
+      )
+    }.to_not raise_error
+  end
+
 end
