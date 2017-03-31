@@ -31,12 +31,12 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       :name               => 'name',
       :parent             => 'parent',
       :rule               => 'rule',
-      :variables          => 'variables'
+      :variables          => 'variables',
+      :description        => 'description',
     }
   end
 
   def self.instances
-    deprecation_warning('This provider is being deprecated.  See https provider at https://github.com/WhatsARanjit/prosvcs-node_manager/blob/https_provider/HTTPS.md')
     $ngs = classifier.groups.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
@@ -57,6 +57,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   end
 
   def self.prefetch(resources)
+    deprecation_warning('This provider is being deprecated.  See https provider at https://github.com/WhatsARanjit/prosvcs-node_manager/blob/https_provider/HTTPS.md')
     ngs = instances
     resources.keys.each do |group|
       if provider = ngs.find{ |g| g.name == group }

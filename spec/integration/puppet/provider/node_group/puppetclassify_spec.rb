@@ -20,7 +20,8 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
                 ".*"
             ]
         ],
-        "variables": {}
+        "variables": {},
+        "description": "Sample message"
     }
   ]
   EOS
@@ -36,6 +37,7 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
       "stubkey"  => "stubvalue",
       "stubkey2" => "stubvalue2"
     },
+    "description"        => "Sample message",
     "name"               => "stub_name",
   }.to_json
 
@@ -52,6 +54,7 @@ describe Puppet::Type.type(:node_group).provider(:puppetclassify) do
         :stubkey  => :stubvalue,
         :stubkey2 => :stubvalue2,
       },
+      :description          => "Sample message",
     )
   end
 

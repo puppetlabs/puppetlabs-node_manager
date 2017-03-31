@@ -13,12 +13,7 @@
 
 ## Overview
 
-Create and manage Node Manager API endpoints as resources.
-
-## Module State
-
-NOTE: This module is a Professional Service side project and is currently unmaintained.
-It is not supported and may not function as expected.
+Create and manage PE node groups as resources.
 
 ## Requirements
 
@@ -60,6 +55,10 @@ node_group { 'PE MCollective':
 ```
 
 #### Node_group parameters
+
+* `description`
+
+  Description of the node_group.
 
 * `classes`
 
@@ -181,4 +180,3 @@ This repositority is largely the work of some Puppet community members.
 It is not officially maintained by Puppet, or any individual in
 particular. Issues should be opened in Github. Questions should be directed
 at the individuals responsible for committing that particular code.
-
