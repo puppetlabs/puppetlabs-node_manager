@@ -56,6 +56,9 @@ node_group { 'PE MCollective':
 
 #### Node_group parameters
 
+* `description`<br />
+Description of the node_group.
+
 * `classes`<br />
 Classes that are assigned to the node in hash format.  Elements of the hash
 are class parameters. Default (empty hash): `{}`
