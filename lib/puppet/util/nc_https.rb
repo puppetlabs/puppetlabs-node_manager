@@ -64,19 +64,6 @@ class Puppet::Util::Nc_https
     end
   end
 
-  # Transform the node group array in to a hash
-  # with a key of the name and an attribute
-  # hash of the rest.
-  def self.hashify_group_array(group_array)
-    hashified = Hash.new
-
-    group_array.each do |group|
-      hashified[group['name']] = group
-    end
-
-    hashified
-  end
-
   private
 
   def do_https(endpoint, method = 'post', data = {})

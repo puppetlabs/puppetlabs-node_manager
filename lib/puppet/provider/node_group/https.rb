@@ -1,4 +1,5 @@
 require 'puppet/util/nc_https'
+require 'puppet_x/node_manager/common'
 
 Puppet::Type.type(:node_group).provide(:https) do
 
@@ -126,6 +127,11 @@ Puppet::Type.type(:node_group).provide(:https) do
     else
       @property_hash[:parent]
     end
+  end
+
+  def classes
+    # Need to deep sort hashes so they be evaluated equally
+    PuppetX::Node_manager::Common.sort_hash(@property_hash[:classes])
   end
 
   friendly_name.each do |property,friendly|
