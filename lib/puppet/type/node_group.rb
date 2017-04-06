@@ -1,3 +1,5 @@
+require 'puppet_x/node_manager/common'
+
 Puppet::Type.newtype(:node_group) do
   desc 'The node_group type creates and manages node groups for the PE Node Manager'
   ensurable
@@ -38,6 +40,10 @@ Puppet::Type.newtype(:node_group) do
     defaultto {}
     validate do |value|
       fail("Classes must be supplied as a hash") unless value.is_a?(Hash)
+    end
+    # Need to deep sort hashes so they be evaluated equally
+    munge do |value|
+      PuppetX::Node_manager::Common.sort_hash(value)
     end
   end
   newproperty(:description) do
