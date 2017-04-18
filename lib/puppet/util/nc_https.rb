@@ -3,17 +3,33 @@ require 'json'
 class Puppet::Util::Nc_https
 
   def initialize
-    @ca_certificate_path = Puppet.settings['localcacert']
-    @certificate_path    = Puppet.settings['hostcert']
-    @private_key_path    = Puppet.settings['hostprivkey']
+    if File.exists?("#{Puppet.settings['confdir']}/node_manager.yaml")
+      settings_file = "#{Puppet.settings['confdir']}/node_manager.yaml"
+    else
+      settings_file = "#{Puppet.settings['confdir']}/classifier.yaml"
+    end
 
     begin
-      nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
+      nc_settings = YAML.load_file(settings_file)
       nc_settings = nc_settings.first if nc_settings.class == Array            
     rescue
-      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+      fail "Could not find file #{settings_file}"
     else
-      @classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
+      cl_server       = nc_settings['server'] || Puppet.settings['server']
+      cl_port         = nc_settings['port']   || 4433
+      @classifier_url = "https://#{cl_server}:#{cl_port}/classifier-api"
+      @token          = nc_settings['token']
+      unless cl_server == Puppet.settings['certname']
+        remote_client = "#{Facter.value('fqdn')} (#{Facter.value('ipaddress')})"
+        Puppet.debug("Managing node_group remotely from #{remote_client}")
+      end
+      Puppet.debug("classifier_url: #{@classifier_url}")
+
+      unless @token and ! @token.empty?
+        @ca_certificate_path = nc_settings['localcacert'] || Puppet.settings['localcacert']
+        @certificate_path    = nc_settings['hostcert']    || Puppet.settings['hostcert']
+        @private_key_path    = nc_settings['hostprivkey'] || Puppet.settings['hostprivkey']
+      end
     end
   end
 
@@ -71,17 +87,25 @@ class Puppet::Util::Nc_https
     uri  = URI(url)
     http = Net::HTTP.new(uri.host, uri.port)
 
-    if uri.scheme == 'https'
+    unless @token and ! @token.empty?
+      Puppet.debug('Using SSL authentication')
       http.use_ssl     = true
       http.cert        = OpenSSL::X509::Certificate.new(File.read @certificate_path)
       http.key         = OpenSSL::PKey::RSA.new(File.read @private_key_path)
       http.ca_file     = @ca_certificate_path
       http.verify_mode = OpenSSL::SSL::VERIFY_CLIENT_ONCE
+    else
+      Puppet.debug('Using token authentication')
+      http.use_ssl     = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
     req              = Object.const_get("Net::HTTP::#{method.capitalize}").new(uri.request_uri)
     req.body         = data.to_json
     req.content_type = 'application/json'
+
+    # If using token
+    req['X-Authentication'] = @token if @token
 
     begin
       res = http.request(req)

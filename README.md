@@ -4,6 +4,7 @@
 
 1. [Overview](#overview)
 1. [Requirements](#requirements)
+1. [Authentication](#authentication)
 1. [Types](#types)
     * [Node_group](#node_group)
     * [Puppet_environment](#puppet_environment)
@@ -29,6 +30,33 @@ Create and manage PE node groups as resources.
 
 The node_manager class facilitates the deployment of the puppetclassify gem
 simply include node_manager in your node definition or add it to the pe_master node group
+
+## Authentication
+
+### PE Console server
+
+Using the types and functions on the PE Console server will read the configuration at
+`/etc/puppetlabs/puppet/classifier.yaml` which contains the default server information
+and SSL certificate paths.  No extra configuration is necessary.
+
+### Remote client or custom information
+
+In order to manage node groups from a remote client, you'll need to [whitelist a certificate](https://docs.puppet.com/pe/latest/nc_forming_requests.html#whitelisted-certificate)
+or [generate a token](https://docs.puppet.com/pe/latest/nc_forming_requests.html#authentication-token) with permissions to edit node groups.
+Create a file at `/etc/puppetlabs/puppet/node_manager.yaml` in the following format:
+
+```
+server: master.puppetlabs.vm             # Defaults to $settings::server
+port: 4433                               # Defaults to 4433
+# Supply certs
+hostcert: /root/certs/client.pem
+hostprivkey: /root/certs/client_key.pem
+localcacert: /root/certs/ca.pem
+# Or token
+token: AJLqDQxalbVSMWrZcX03aGtixvk_S2xGZfQizY9YvzVk
+```
+
+_NOTE:_ The token will be favored if both SSL and a token is provided.
 
 ## Types
 
