@@ -80,6 +80,76 @@ class Puppet::Util::Nc_https
     end
   end
 
+  def import_hierarchy(data)
+    res = do_https('v1/import-hierarchy', 'POST', data)
+    if res.code.to_i != 204
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+      fail('Unable to import node_groups')
+    else
+      true
+    end
+  end
+
+  def get_classes(env = false, name = false)
+    url_array = ['v1']
+    url_array << 'classes' unless env
+    url_array << "environments/#{env}/classes" if env
+    url_array << name if name
+    res = do_https(url_array.join('/'), 'GET')
+    if res.code.to_i != 200
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+      fail JSON.parse(res.body)['msg']
+    else
+      JSON.parse(res.body)
+    end
+  end
+
+  def update_classes(env = nil)
+    url_array = ['v1/update-classes']
+    url_array << "?environment=#{env}" if env
+    res  = do_https(url_array.join('/'), 'POST')
+    if res.code.to_i != 201
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+      fail('Unable to update classes')
+    else
+      true
+    end
+  end
+
+  def get_classified(name, expl = false, facts = {}, trusted = {})
+    url_array = ['v1/classified/nodes']
+    url_array << name
+    url_array << 'explanation' if expl
+    data = facts.merge(trusted)
+    res  = do_https(url_array.join('/'), 'POST', data)
+    require 'pry'; binding.pry
+    if res.code.to_i != 200
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+    else
+      JSON.parse(res.body)
+    end
+  end
+
+  def unpin_from_all(node)
+    data = { 'nodes' => [node] }
+    res  = do_https('v1/commands/unpin-from-all', 'POST', data)
+    if res.code.to_i != 200
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+    else
+      JSON.parse(res.body)
+    end
+  end
+
+  def get_environments
+    res = do_https('v1/environments', 'GET')
+    JSON.parse(res.body)
+  end
+
   private
 
   def do_https(endpoint, method = 'post', data = {})

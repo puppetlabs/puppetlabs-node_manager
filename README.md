@@ -10,6 +10,7 @@
     * [Puppet_environment](#puppet_environment)
 1. [Functions](#functions)
     * [node_groups()](#node_groups)
+1. [Face](#face)
 1. [Things to do](#things-to-do)
 
 ## Overview
@@ -196,6 +197,34 @@ Retrieve all or one node_group and its data.
   ```
 
 _Type:_ rvalue
+
+## Face
+
+The `node_manager` face allows you to interact with endpoints other than
+the groups endpoint using the type or function. Use the `--help` flag
+to explore functionaliy of each action.
+
+```
+# puppet node_manager --help
+
+USAGE: puppet node_manager <action>
+
+Interact with node classifier API
+
+OPTIONS:
+  --render-as FORMAT             - The rendering format to use.
+  --verbose                      - Whether to log verbosely.
+  --debug                        - Whether to log debug information.
+
+ACTIONS:
+  classes         List class information
+  classified      List classification information
+  environments    Query environment sync status
+  groups          List group information
+  unpin           Unpin a node from all groups
+
+See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
+```
 
 ## Things to do
 
