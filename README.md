@@ -21,9 +21,7 @@ Create and manage PE node groups as resources.
 
 * \*nix operating system
 * Puppet >= 3.7.1
-* [puppetclassify](https://github.com/puppetlabs/puppet-classify) gem
-* [puppetlabs/pe_gem module](https://forge.puppetlabs.com/puppetlabs/pe_gem)
-* NOTE: new `https` provider which doesn't need gem dependency at [HTTPS.md](HTTPS.md)
+* New `https` provider which doesn't need `puppetclassify` gem
 
 ## Classes
 
@@ -119,33 +117,13 @@ node_group { 'PE MCollective':
 
   The UID for the data group. Can be specified by group name or UID.
 
-  Default: `default`
+  Default: `All Nodes`
 
 * `rules`
 
   An array of classification rules.
 
   Default (empty array): `[]`
-
-### Puppet_environment
-
-Enumerate all puppet environments:
-
-* `puppet resource puppet_environment`
-
-Example output for `puppet resource puppet_environment production`
-
-```puppet
-puppet_environment { 'production':
-  ensure => 'present',
-}
-```
-
-#### Puppet_environment parameters
-
-* `name`
-
-  (namevar) Name of the Puppet environment on disk, i.e. the directory name in `$environmentpath`.
 
 ## Functions
 
@@ -157,10 +135,10 @@ Retrieve all or one node_group and its data.
 
 ```puppet
 {
-  "default"=>{
+  "All Nodes"=>{
     "environment_trumps"=>false,
     "parent"=>"00000000-0000-4000-8000-000000000000",
-    "name"=>"default",
+    "name"=>"All Nodes",
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
@@ -180,14 +158,14 @@ Retrieve all or one node_group and its data.
 }
 ```
 
-`node_groups('default')` will return:
+`node_groups('All Nodes')` will return:
 
 ```puppet
 {
-  "default"=>{
+  "All Nodes"=>{
     "environment_trumps"=>false,
     "parent"=>"00000000-0000-4000-8000-000000000000",
-    "name"=>"default",
+    "name"=>"All Nodes",
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
@@ -228,8 +206,7 @@ See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
 
 ## Things to do
 
-* Remove `puppetclassify` dependency
-* Get feedback on `https` provider, new [HTTPS.md](HTTPS.md)
+* Remove `puppetclassify` classes
 
 ## Maintainers
 

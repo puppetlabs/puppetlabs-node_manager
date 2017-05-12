@@ -1,15 +1,20 @@
 {
   "name": "WhatsARanjit-node_manager",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "WhatsARanjit",
   "summary": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",
   "source": "https://github.com/WhatsARanjit/prosvcs-node_manager",
   "project_page": "https://github.com/WhatsARanjit/prosvcs-node_manager",
   "issues_url": "https://github.com/WhatsARanjit/prosvcs-node_manager/issues",
-  "dependencies": [ 
-    {"name":"puppetlabs/pe_gem","version_requirement":"0.1.2"}
+  "tags": [
+    "PE",
+    "puppet enterprise",
+    "node group",
+    "node_group",
+    "classification"
   ],
+  "dependencies": [],
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
@@ -35,9 +40,18 @@
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
+        "10.04",
         "12.04",
-        "14.04"
+        "14.04",
+        "16.06"
       ]
     }
-  ]
+  ],
+  "requirements": [
+    {
+      "name": "puppet",
+      "version_requirement": ">= 3.7.1 < 5.0.0"
+    }
+  ],
+  "description": "Node_manager module"
 }
