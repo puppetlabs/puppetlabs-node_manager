@@ -1,3 +1,16 @@
+## 2017-05-12  - Release 0.4.2
+
+### Summary
+
+- Added a `node_manager` face for classifier API
+- Added ability to manage node_groups using SSL or token authentication
+- Added ability to manage node_groups from a remote client
+- Set `https` provider as default
+
+#### Bugfixes
+
+- `classes` attribute Hash is now deep-sorted to maintain idempotency
+
 ## 2017-03-31 - Release 0.4.1
 
 ### Summary

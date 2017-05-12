@@ -2,6 +2,7 @@ require 'puppet/util/nc_https'
 require 'puppet_x/node_manager/common'
 
 Puppet::Type.type(:node_group).provide(:https) do
+  defaultfor :feature => :posix
 
   def initialize(value={})
     super(value)
