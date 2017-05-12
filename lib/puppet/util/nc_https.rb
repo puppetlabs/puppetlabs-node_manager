@@ -125,7 +125,6 @@ class Puppet::Util::Nc_https
     url_array << 'explanation' if expl
     data = facts.merge(trusted)
     res  = do_https(url_array.join('/'), 'POST', data)
-    require 'pry'; binding.pry
     if res.code.to_i != 200
       Puppet.debug("Response code: #{res.code}")
       Puppet.debug("Response message: #{res.body}")
