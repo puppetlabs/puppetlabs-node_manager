@@ -135,6 +135,10 @@ Puppet::Type.type(:node_group).provide(:https) do
     PuppetX::Node_manager::Common.sort_hash(@property_hash[:classes])
   end
 
+  def rule
+    @property_hash[:rule].nil? ? [''] : @property_hash[:rule]
+  end
+
   friendly_name.each do |property,friendly|
     define_method "#{friendly}=" do |value|
       if property == :parent
