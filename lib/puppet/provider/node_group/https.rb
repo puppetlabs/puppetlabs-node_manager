@@ -185,7 +185,11 @@ Puppet::Type.type(:node_group).provide(:https) do
   end
 
   def add_nulls(current, new)
-    allkeys = (current.keys + new.keys).uniq
+    if current.is_a?(Hash)
+      allkeys = (current.keys + new.keys).uniq
+    else
+      allkeys = new.keys
+    end
     newhash = Hash.new
 
     allkeys.each do |k|
