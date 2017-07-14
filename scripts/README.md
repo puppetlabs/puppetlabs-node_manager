@@ -55,7 +55,7 @@ Usage: ./node_group.sh [options] [UID]
  -c| --classes      Hash of classes and parameters.
                 Example: '{ "vim": {} }'
 
- -r| --rules      Array of rules for matching.
+ -r| --rule       Array of rules for matching.
                 Example: '["or", ["=", "name", "node.whatsaranjit.com"]]'
 
  -v| --variables    Variables to set in the group.

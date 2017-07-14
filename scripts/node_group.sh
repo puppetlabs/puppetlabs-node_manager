@@ -18,7 +18,7 @@ Usage: $0 [options] [UID]\n
 \t                   \t\t Default: 00000000-0000-4000-8000-000000000000\n\n
 -c| --classes        \t\t Hash of classes and parameters.\n
 \t                   \t\t Example: '{ "vim": {} }'\n\n
--r| --rules          \t\t Array of rules for matching.\n
+-r| --rule           \t\t Array of rules for matching.\n
 \t                   \t\t Example: '["or", ["=", "name", "node.whatsaranjit.com"]]'\n\n
 -v| --variables        \t Variables to set in the group.\n
 \t                   \t\t Example: '{ "foo": "bar" }'\n\n
