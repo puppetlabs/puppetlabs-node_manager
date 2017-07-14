@@ -14,7 +14,9 @@ Manipulate node_groups from a system without Puppet installed.
 ## Example
 
 ```
-[root@server ~/node_manager/scripts]# ./node_group.sh -n 'Example Group' --rule '["or", ["=", "name", "node.whatsaranjit.com"]]' --classes '{"vim": {}}' --variables '{"foo": "bar"}'
+[root@server ~/node_manager/scripts]# ./node_group.sh -n 'Example Group' \
+--rule '["or", ["=", "name", "node.whatsaranjit.com"]]' \
+--classes '{"vim": {}}' --variables '{"foo": "bar"}'
 New group ID: 15e0c815-e3ca-48e3-a467-e86e5b9d025e
 ```
 
