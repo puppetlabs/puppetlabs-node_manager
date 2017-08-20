@@ -70,6 +70,10 @@ class Puppet::Util::Nc_https
   end
 
   def update_group(data)
+    # ISSUE 26
+    # Add nil for empty rules
+    data = Hash[data.map { |k,v| v == [''] ? [k,nil] : [k,v] }]
+
     res = do_https("v1/groups/#{data['id']}", 'POST', data)
     if res.code.to_i != 200
       Puppet.debug("Response code: #{res.code}")
