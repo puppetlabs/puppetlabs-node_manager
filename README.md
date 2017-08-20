@@ -7,11 +7,11 @@
 1. [Authentication](#authentication)
 1. [Types](#types)
     * [Node_group](#node_group)
-    * [Puppet_environment](#puppet_environment)
 1. [Functions](#functions)
     * [node_groups()](#node_groups)
 1. [Face](#face)
 1. [Things to do](#things-to-do)
+1. [Experimental](#experimental)
 
 ## Overview
 
@@ -121,7 +121,7 @@ node_group { 'PE MCollective':
 
 * `rules`
 
-  An array of classification rules.
+  An array of classification rules.  To submit an empty ruleset, use `''` as your value.
 
   Default (empty array): `[]`
 
@@ -206,7 +206,11 @@ See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
 
 ## Things to do
 
-* Remove `puppetclassify` classes
+* Nothing at the moment
+
+## Experimental
+
+New puppet-less provider with bash [here](scripts/README.md)
 
 ## Maintainers
 
