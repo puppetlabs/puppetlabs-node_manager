@@ -1,3 +1,18 @@
+## 2017-08-20 - Release 0.5.0
+
+### Summary
+
+- Can remove parameters from classes
+- Can upin nodes from a group
+- Added a puppet-less provider for node_group in bash
+- Removed puppet_environment type and provider
+- Removed puppetclassify provider and gem dependency
+
+#### Bugfixes
+- Provider submits nulls for removed parameters to remove them
+- Submitting `''` to rules can remove everything
+
+
 ## 2017-05-12  - Release 0.4.2
 
 ### Summary
