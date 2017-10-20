@@ -137,6 +137,18 @@ class Puppet::Util::Nc_https
     end
   end
 
+  def pin_node(node, group_id)
+    data = { 'nodes' => node, } 
+    res  = do_https("v1/groups/#{group_id}/pin", 'POST', data)
+    require 'pry'; binding.pry
+    if res.code.to_i != 204
+      Puppet.debug("Response code: #{res.code}")
+      Puppet.debug("Response message: #{res.body}")
+    else
+      JSON.parse(res.body)
+    end
+  end
+
   def unpin_from_all(node)
     data = { 'nodes' => [node] }
     res  = do_https('v1/commands/unpin-from-all', 'POST', data)

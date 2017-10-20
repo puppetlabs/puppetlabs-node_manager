@@ -125,6 +125,20 @@ node_group { 'PE MCollective':
 
   Default (empty array): `[]`
 
+* `variables`
+
+  Global variables for the node group expressed in a hash as `{ 'var' => 'value' }`.
+
+  Default (empty hash): `{}`
+
+* `data`
+
+  Configuration data supplied for automatic parameter lookup for the group. 
+Data for the node group expressed in a hash as `{ 'class' => { 'param' => 'value' }}`.
+This parameter is supported for PE >=2017.3.x.
+
+  Default (empty hash): `{}`
+
 ## Functions
 
 ### node_groups()
@@ -142,7 +156,8 @@ Retrieve all or one node_group and its data.
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
-    "classes"=>{}
+    "classes"=>{},
+    "config_data"=>{}
   },
   "Production environment"=>{
     "environment_trumps"=>false,
@@ -152,7 +167,8 @@ Retrieve all or one node_group and its data.
     "variables"=>{},
     "id"=>"7233f964-951e-4a7f-88ea-72676ed3104d",
     "environment"=>"production",
-    "classes"=>{}
+    "classes"=>{},
+    "config_data"=>{}
   },
   ...
 }
@@ -169,7 +185,8 @@ Retrieve all or one node_group and its data.
     "rule"=>["and", ["~", "name", ".*"]],
     "variables"=>{}, "id"=>"00000000-0000-4000-8000-000000000000",
     "environment"=>"production",
-    "classes"=>{}
+    "classes"=>{},
+    "config_data"=>{}
   }
 }
   ```
@@ -199,6 +216,7 @@ ACTIONS:
   classified      List classification information
   environments    Query environment sync status
   groups          List group information
+  pin             Pin a node to a group
   unpin           Unpin a node from all groups
 
 See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
