@@ -1,3 +1,12 @@
+## 2017-10-20 - Release 0.6.0
+
+### Summary
+
+- Added `pin` action to face
+- Added `data` parameter to `node_group` type for Console data
+- Added support for `data` parameter to `https` provider
+- Added `config_data` argument to puppet-less provider
+
 ## 2017-08-20 - Release 0.5.0
 
 ### Summary

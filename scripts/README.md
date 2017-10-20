@@ -61,6 +61,9 @@ Usage: ./node_group.sh [options] [UID]
  -v| --variables    Variables to set in the group.
                 Example: '{ "foo": "bar" }'
 
+ -a| --config_data    Configuration data for the group.
+                Example: '{ "vim": { "vim_package": "vim-common" } }'
+
  -h| --help      Display this help message.
  ```
 

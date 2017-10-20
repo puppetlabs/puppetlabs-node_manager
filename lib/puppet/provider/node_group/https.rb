@@ -34,6 +34,7 @@ Puppet::Type.type(:node_group).provide(:https) do
       :rule               => 'rule',
       :variables          => 'variables',
       :description        => 'description',
+      :config_data        => 'data',
     }
   end
 
@@ -82,6 +83,7 @@ Puppet::Type.type(:node_group).provide(:https) do
       key = k.to_s
       # key changed for usability
       key = 'environment_trumps' if key == 'override_environment'
+      key = 'config_data'        if key == 'data'
       send_data[key] = v
     end
     # namevar may not be in this hash
@@ -135,6 +137,11 @@ Puppet::Type.type(:node_group).provide(:https) do
     PuppetX::Node_manager::Common.sort_hash(@property_hash[:classes])
   end
 
+  def data
+    # Need to deep sort hashes so they be evaluated equally
+    PuppetX::Node_manager::Common.sort_hash(@property_hash[:data])
+  end
+
   def rule
     @property_hash[:rule].nil? ? [''] : @property_hash[:rule]
   end
@@ -148,11 +155,11 @@ Puppet::Type.type(:node_group).provide(:https) do
           gindex = $ngs.index { |i| i['name'] == value }
           @property_flush['attrs'][property.to_s] = $ngs[gindex]['id']
         end
-      # These 2 attributes are additive, so need to submit nulls to remove unwanted values
-      elsif [:variables, :classes].include?(property)
-        @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[property], value)
+      # These 3 attributes are additive, so need to submit nulls to remove unwanted values
+      elsif [:variables, :classes, :config_data].include?(property)
+        @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[friendly.to_sym], value)
         # For logging return to original intended value
-        @resource[property] = value.select { |k,v| v != nil }
+        @resource[friendly.to_sym] = value.select { |k,v| v != nil }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
@@ -198,7 +205,9 @@ Puppet::Type.type(:node_group).provide(:https) do
 
     allkeys.each do |k|
       if new[k].is_a?(Hash)
-        newhash[k] = add_nulls(current[k], new[k])
+        # Push forward an empty hash if nothing is there
+        _current   = current.is_a?(Hash) ? current[k] : {}
+        newhash[k] = add_nulls(_current, new[k])
       else
         newhash[k] = new[k] || nil
       end

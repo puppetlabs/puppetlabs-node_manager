@@ -46,6 +46,17 @@ Puppet::Type.newtype(:node_group) do
       PuppetX::Node_manager::Common.sort_hash(value)
     end
   end
+  newproperty(:data) do
+    desc 'Data applied to this group'
+    #defaultto {}
+    validate do |value|
+      fail("Data must be supplied as a hash") unless value.is_a?(Hash)
+    end
+    # Need to deep sort hashes so they be evaluated equally
+    munge do |value|
+      PuppetX::Node_manager::Common.sort_hash(value)
+    end
+  end
   newproperty(:description) do
     desc 'Description of this group'
   end

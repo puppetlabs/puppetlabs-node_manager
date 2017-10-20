@@ -22,6 +22,8 @@ Usage: $0 [options] [UID]\n
 \t                   \t\t Example: '["or", ["=", "name", "node.whatsaranjit.com"]]'\n\n
 -v| --variables        \t Variables to set in the group.\n
 \t                   \t\t Example: '{ "foo": "bar" }'\n\n
+-a| --config_data      \t Configuration data for the group.\n
+\t                   \t\t Example: '{ "vim": { "vim_package": "vim-common" } }'\n\n
 -h| --help           \t\t Display this help message.\n
 EOF`
 
@@ -108,6 +110,11 @@ else
       -v|--variables)
       VARIABLES="$2"
       DATA="${DATA} \"variables\": $VARIABLES,"
+      shift
+      ;;
+      -a|--config_data)
+      CONFIG_DATA="$2"
+      DATA="${DATA} \"config_data\": ${CONFIG_DATA},"
       shift
       ;;
       *)

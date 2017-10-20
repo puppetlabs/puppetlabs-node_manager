@@ -141,6 +141,40 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     end
   end
 
+  action :pin do
+    summary 'Pin a node to a group'
+    arguments 'nodename'
+
+    option '--node_group GROUP' do
+      summary 'Node group to pin to'
+      default_to { '00000000-0000-4000-8000-000000000000' }
+    end
+
+    when_invoked do |*args|
+      nodename = args.first
+      options  = args.last
+      require 'pry'; binding.pry
+
+      if options[:node_group]
+        'Success' if classifier.pin_node(nodename, options[:node_group])
+      else
+      end
+    end
+
+    when_rendering :console do |output|
+      case output
+      when Hash
+        if output.length <= 1
+          JSON.pretty_generate output.values[0]
+        else
+          output.keys
+        end
+      else
+        output
+      end
+    end
+  end
+
   action :unpin do
     summary 'Unpin a node from all groups'
     arguments 'nodename'
