@@ -48,8 +48,8 @@ class Puppet::Util::Nc_https
     endpoint = data.has_key?('id') ? "v1/groups/#{data['id']}" : 'v1/groups'
     res = do_https(endpoint, 'POST', data)
     if res.code.to_i != 303
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      Puppet.err("Response code: #{res.code}")
+      Puppet.err("Response message: #{res.body}")
       fail("Unable to create node_group '#{data['name']}'")
     else
       new_UID = res['location'].split('/')[-1]
