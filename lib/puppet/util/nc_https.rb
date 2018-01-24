@@ -11,7 +11,7 @@ class Puppet::Util::Nc_https
 
     begin
       nc_settings = YAML.load_file(settings_file)
-      nc_settings = nc_settings.first if nc_settings.class == Array            
+      nc_settings = nc_settings.first if nc_settings.class == Array
     rescue
       fail "Could not find file #{settings_file}"
     else
@@ -138,7 +138,7 @@ class Puppet::Util::Nc_https
   end
 
   def pin_node(node, group_id)
-    data = { 'nodes' => node, } 
+    data = { 'nodes' => node, }
     res  = do_https("v1/groups/#{group_id}/pin", 'POST', data)
     require 'pry'; binding.pry
     if res.code.to_i != 204
@@ -185,7 +185,7 @@ class Puppet::Util::Nc_https
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
     end
 
-    req              = Object.const_get("Net::HTTP::#{method.capitalize}").new(uri.request_uri)
+    req              = Net::HTTP.const_get(method.capitalize).new(uri.request_uri)
     req.body         = data.to_json
     req.content_type = 'application/json'
 
