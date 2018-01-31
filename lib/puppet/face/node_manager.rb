@@ -231,8 +231,8 @@ Puppet::Face.define(:node_manager, '0.1.0') do
   def check_facts(file, options)
     if file && options[:explain]
       begin
-        contents  = YAML.load_file(file)
-        content ||= JSON.parse(File.read file)
+        contents   = YAML.load_file(file)
+        contents ||= JSON.parse(File.read file)
       rescue
         fail "Could not file file '#{file}'"
       else
