@@ -1,3 +1,10 @@
+## 2018-01-31 - Release 0.6.1
+
+### Summary
+
+- Typo in face output
+- JRuby method fix
+
 ## 2017-10-20 - Release 0.6.0
 
 ### Summary
