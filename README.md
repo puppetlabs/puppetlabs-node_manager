@@ -23,13 +23,6 @@ Create and manage PE node groups as resources.
 * Puppet >= 3.7.1
 * New `https` provider which doesn't need `puppetclassify` gem
 
-## Classes
-
-### Node_manager
-
-The node_manager class facilitates the deployment of the puppetclassify gem
-simply include node_manager in your node definition or add it to the pe_master node group
-
 ## Authentication
 
 ### PE Console server
