@@ -36,8 +36,7 @@ class Puppet::Util::Nc_https
   def get_groups
     res = do_https('v1/groups', 'GET')
     if res.code.to_i != 200
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail('Unable to get node_group list')
     else
       JSON.parse(res.body)
@@ -48,8 +47,7 @@ class Puppet::Util::Nc_https
     endpoint = data.has_key?('id') ? "v1/groups/#{data['id']}" : 'v1/groups'
     res = do_https(endpoint, 'POST', data)
     if res.code.to_i != 303
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail("Unable to create node_group '#{data['name']}'")
     else
       new_UID = res['location'].split('/')[-1]
@@ -61,8 +59,7 @@ class Puppet::Util::Nc_https
   def delete_group(id)
     res = do_https("v1/groups/#{id}", 'DELETE')
     if res.code.to_i != 204
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail("Unable to delete node_group '#{data['name']}'")
     else
       true
@@ -76,8 +73,7 @@ class Puppet::Util::Nc_https
 
     res = do_https("v1/groups/#{data['id']}", 'POST', data)
     if res.code.to_i != 200
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail("Unable to update node_group '#{data['name']}'")
     else
       true
@@ -87,8 +83,7 @@ class Puppet::Util::Nc_https
   def import_hierarchy(data)
     res = do_https('v1/import-hierarchy', 'POST', data)
     if res.code.to_i != 204
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail('Unable to import node_groups')
     else
       true
@@ -102,8 +97,7 @@ class Puppet::Util::Nc_https
     url_array << name if name
     res = do_https(url_array.join('/'), 'GET')
     if res.code.to_i != 200
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail JSON.parse(res.body)['msg']
     else
       JSON.parse(res.body)
@@ -115,8 +109,7 @@ class Puppet::Util::Nc_https
     url_array << "?environment=#{env}" if env
     res  = do_https(url_array.join('/'), 'POST')
     if res.code.to_i != 201
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
       fail('Unable to update classes')
     else
       true
@@ -130,8 +123,7 @@ class Puppet::Util::Nc_https
     data = facts.merge(trusted)
     res  = do_https(url_array.join('/'), 'POST', data)
     if res.code.to_i != 200
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
     else
       JSON.parse(res.body)
     end
@@ -142,8 +134,7 @@ class Puppet::Util::Nc_https
     res  = do_https("v1/groups/#{group_id}/pin", 'POST', data)
     require 'pry'; binding.pry
     if res.code.to_i != 204
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
     else
       JSON.parse(res.body)
     end
@@ -153,8 +144,7 @@ class Puppet::Util::Nc_https
     data = { 'nodes' => [node] }
     res  = do_https('v1/commands/unpin-from-all', 'POST', data)
     if res.code.to_i != 200
-      Puppet.debug("Response code: #{res.code}")
-      Puppet.debug("Response message: #{res.body}")
+      error_msg(res)
     else
       JSON.parse(res.body)
     end
@@ -201,5 +191,12 @@ class Puppet::Util::Nc_https
       res
     end
   end
-
+  def error_msg(res)
+    json = JSON.parse(res.body)
+    kind = json['kind']
+    msg  = json['msg']
+    Puppet.err %(node_manager failed with error type '#{kind}': #{msg})
+    Puppet.debug("Response code: #{res.code}")
+    Puppet.debug("Response message: #{res.body}")
+  end
 end
