@@ -107,7 +107,7 @@ class Puppet::Util::Nc_https
   def update_classes(env = nil)
     url_array = ['v1/update-classes']
     url_array << "?environment=#{env}" if env
-    res  = do_https(url_array.join('/'), 'POST')
+    res  = do_https(url_array.join(''), 'POST')
     if res.code.to_i != 201
       error_msg(res)
       fail('Unable to update classes')

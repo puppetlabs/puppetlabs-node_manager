@@ -7,6 +7,8 @@
 1. [Authentication](#authentication)
 1. [Types](#types)
     * [Node_group](#node_group)
+1. [Tasks](#tasks}
+    * [update_classes](#update_classes)
 1. [Functions](#functions)
     * [node_groups()](#node_groups)
 1. [Face](#face)
@@ -131,6 +133,19 @@ Data for the node group expressed in a hash as `{ 'class' => { 'param' => 'value
 This parameter is supported for PE >=2017.3.x.
 
   Default (empty hash): `{}`
+
+## Tasks
+
+### update_classes
+
+Trigger update-classes job
+
+```shell
+puppet task run node_manager::update_classes --nodes 'pe-master' environment=production
+
+```
+
+__NOTE__: Default environment value is `production`.
 
 ## Functions
 
