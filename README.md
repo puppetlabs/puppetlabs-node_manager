@@ -7,7 +7,7 @@
 1. [Authentication](#authentication)
 1. [Types](#types)
     * [Node_group](#node_group)
-1. [Tasks](#tasks}
+1. [Tasks](#tasks)
     * [update_classes](#update_classes)
 1. [Functions](#functions)
     * [node_groups()](#node_groups)

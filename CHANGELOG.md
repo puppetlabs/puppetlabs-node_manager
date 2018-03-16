@@ -1,3 +1,17 @@
+## 2018-03-15 - Release 0.7.1
+
+## Summary
+
+- Typo fix in README
+- Change of repo name to puppet-node_manager
+
+## 2018-03-15 - Release 0.7.0
+
+### Summary
+
+- Added task for update-classes endpoint
+- JRuby method fix for Net::Http
+
 ## 2018-01-31 - Release 0.6.1
 
 ### Summary
