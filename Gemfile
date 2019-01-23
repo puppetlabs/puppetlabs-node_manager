@@ -2,9 +2,7 @@ source "https://rubygems.org"
 
 group :test do
   gem "rake"
-#  gem "puppet", ENV['PUPPET_VERSION'] || '~> 3.7.3'
   gem "rspec-puppet", :git => 'https://github.com/rodjek/rspec-puppet.git'
-#  gem "puppetlabs_spec_helper"
   gem 'rspec-puppet-utils', :git => 'https://github.com/Accuity/rspec-puppet-utils.git'
   gem 'hiera-puppet-helper', :git => 'https://github.com/bobtfish/hiera-puppet-helper.git'
   # there seems to be a bug with puppet-blacksmith and metadata-json-lint
@@ -26,6 +24,6 @@ end
 source 'https://rubygems.org'
 
 gem 'puppet', nil || ENV['PUPPET_VERSION']
-gem 'puppetlabs_spec_helper', '0.10.3'
+gem 'puppetlabs_spec_helper', '2.13.1'
 gem 'webmock', '1.22.1'
 gem 'puppetclassify', '0.1.7'

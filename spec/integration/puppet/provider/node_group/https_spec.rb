@@ -1,4 +1,4 @@
-require 'puppetlabs_spec_helper/module_spec_helper'
+require 'spec_helper'
 require 'webmock/rspec'
 
 describe Puppet::Type.type(:node_group).provider(:https) do
@@ -58,11 +58,19 @@ describe Puppet::Type.type(:node_group).provider(:https) do
   end
 
   before do
-      YAML.stubs(:load_file).with('/dev/null/classifier.yaml')
-        .returns({'server' => 'stubserver', 'port' => '8080'})
-    File.stubs(:read).returns('helloworld')
-    OpenSSL::X509::Certificate.stubs(:new) {mock_model(OpenSSL::X509::Certificate, :save => true)}
-    OpenSSL::PKey::RSA.stubs(:new) {mock_model(OpenSSL::PKey::RSA, :save => true)}
+    allow(File).to receive(:exist?).and_return(false)
+    allow(File).to receive(:exist?).with('/dev/null/classifier.yaml').and_return(true)
+    allow(File).to receive(:exist?).with('/dev/null/certificate.pem').and_return(true)
+    allow(File).to receive(:read).and_return('helloworld')
+    allow(OpenSSL::X509::Certificate).to receive(:new).and_return(double("Cert", :save => true))
+    allow(OpenSSL::PKey::RSA).to receive(:new).and_return(double("Key", :save => true))
+    allow(YAML).to receive(:load_file).with('/dev/null/classifier.yaml').and_return({
+      'server'      => 'stubserver',
+      'port'        => '8080',
+      'localcacert' => '/dev/null/certificate.pem',
+      'hostcert'    => '/dev/null/certificate.pem',
+      'hostprivkey' => '/dev/null/certificate.pem',
+    })
   end
 
   describe "#instances" do

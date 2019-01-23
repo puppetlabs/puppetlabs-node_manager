@@ -71,20 +71,8 @@ describe 'node_groups' do
   }
 
   before do
-    YAML.stubs(:load_file).returns({
-      'server' => 'stubserver',
-      'port'   => '8080',
-    })
-    stub_request(
-      :get,
-      'https://stubserver:8080/classifier-api/v1/groups',
-    ).to_return(
-      :status => 200,
-      :body   => groups_response
-    )
-    File.stubs(:read).returns('helloworld')
-    OpenSSL::X509::Certificate.stubs(:new) {mock_model(OpenSSL::X509::Certificate, :save => true)}
-    OpenSSL::PKey::RSA.stubs(:new) {mock_model(OpenSSL::PKey::RSA, :save => true)}
+    nc = double("NC", :get_groups => JSON.parse(groups_response))
+    allow(Puppet::Util::Nc_https).to receive(:new).and_return(nc)
   end
 
   describe 'without an argument' do
