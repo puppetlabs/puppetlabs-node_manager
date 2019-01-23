@@ -20,11 +20,18 @@ class Puppet::Util::Node_groups < parent
       "private_key_path"    => Puppet.settings['hostprivkey'],
     }
 
+    classifier_yaml = [
+      File.join(Puppet.settings['confdir'], 'classifier.yaml'),
+      '/etc/puppetlabs/puppet/classifier.yaml',
+    ].find { |file| File.exist?(file) }
+
+    fail "node_manager: could not find classifier.yaml" if classifier_yaml.nil?
+
     begin
-      nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-      nc_settings = nc_settings.first if nc_settings.class == Array            
+      nc_settings = YAML.load_file(classifier_yaml)
+      nc_settings = nc_settings.first if nc_settings.class == Array
     rescue
-      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+      fail "Could not load file #{classifier_yaml}"
     else
       classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
     end

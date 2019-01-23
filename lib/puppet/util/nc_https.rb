@@ -3,17 +3,21 @@ require 'json'
 class Puppet::Util::Nc_https
 
   def initialize
-    if File.exists?("#{Puppet.settings['confdir']}/node_manager.yaml")
-      settings_file = "#{Puppet.settings['confdir']}/node_manager.yaml"
-    else
-      settings_file = "#{Puppet.settings['confdir']}/classifier.yaml"
-    end
+
+    settings_file = [
+      File.join(Puppet.settings['confdir'], 'node_manager.yaml'),
+      File.join(Puppet.settings['confdir'], 'classifier.yaml'),
+      '/etc/puppetlabs/puppet/node_manager.yaml',
+      '/etc/puppetlabs/puppet/classifier.yaml',
+    ].find { |file| File.exist?(file) }
+
+    fail "node_manager: Could not find settings file" if settings_file.nil?
 
     begin
       nc_settings = YAML.load_file(settings_file)
       nc_settings = nc_settings.first if nc_settings.class == Array
     rescue
-      fail "Could not find file #{settings_file}"
+      fail "Could not load file #{settings_file}"
     else
       cl_server       = nc_settings['server'] || Puppet.settings['server']
       cl_port         = nc_settings['port']   || 4433
@@ -26,9 +30,30 @@ class Puppet::Util::Nc_https
       Puppet.debug("classifier_url: #{@classifier_url}")
 
       unless @token and ! @token.empty?
-        @ca_certificate_path = nc_settings['localcacert'] || Puppet.settings['localcacert']
-        @certificate_path    = nc_settings['hostcert']    || Puppet.settings['hostcert']
-        @private_key_path    = nc_settings['hostprivkey'] || Puppet.settings['hostprivkey']
+        settings = ['localcacert', 'hostcert', 'hostprivkey']
+        default_cert_paths = ['/etc/puppetlabs/puppet/ssl/certs/ca.pem',
+                              File.join('/etc/puppetlabs/puppet/ssl/certs', Puppet.settings['certname'] + '.pem'),
+                              File.join('/etc/puppetlabs/puppet/ssl/private_keys', Puppet.settings['certname'] + '.pem')]
+
+        case
+        when settings.map{ |k| nc_settings[k] }.all?{ |cert| !cert.nil? && File.exist?(cert) }
+          Puppet.debug("Using certificate paths from #{settings_file}")
+          @ca_certificate_path = nc_settings['localcacert']
+          @certificate_path    = nc_settings['hostcert']
+          @private_key_path    = nc_settings['hostprivkey']
+        when settings.map{ |k| Puppet.settings[k] }.all?{ |cert| !cert.nil? && File.exist?(cert) }
+          Puppet.debug("Using Puppet settings for certificate paths")
+          @ca_certificate_path = Puppet.settings['localcacert']
+          @certificate_path    = Puppet.settings['hostcert']
+          @private_key_path    = Puppet.settings['hostprivkey']
+        when default_cert_paths.all?{ |cert| File.exist?(cert) }
+          Puppet.debug("Using certificates from default certificate paths")
+          @ca_certificate_path = default_cert_paths[0]
+          @certificate_path    = default_cert_paths[1]
+          @private_key_path    = default_cert_paths[2]
+        else
+          raise "node_manager: Unable to load certificates!"
+        end
       end
     end
   end
