@@ -153,7 +153,6 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     when_invoked do |*args|
       nodename = args.first
       options  = args.last
-      require 'pry'; binding.pry
 
       if options[:node_group]
         'Success' if classifier.pin_node(nodename, options[:node_group])
