@@ -175,15 +175,29 @@ Puppet::Face.define(:node_manager, '0.1.0') do
   end
 
   action :unpin do
-    summary 'Unpin a node from all groups'
+    summary 'Unpin a node from a group'
     arguments 'nodename'
 
+    option '--all' do
+      summary 'Unpin a node from all groups'
+      default_to { false }
+    end
+
+    option '--node_group GROUP' do
+      summary 'Node group to unpin from'
+      default_to { '00000000-0000-4000-8000-000000000000' }
+    end
+
     when_invoked do |nodename, options|
-      output << classifier.unpin_from_all(nodename)
-      if output.flatten.first['nodes'].empty?
-        'Found nothing to unpin.'
+      if options[:all]
+        output << classifier.unpin_from_all(nodename)
+        if output.flatten.first['nodes'].empty?
+          'Found nothing to unpin.'
+        else
+          PuppetX::Node_manager::Common.hashify_group_array(output.flatten.first['nodes'])
+        end
       else
-        PuppetX::Node_manager::Common.hashify_group_array(output.flatten['nodes'].first)
+        'Success' if classifier.unpin_node(nodename, options[:node_group])
       end
     end
 
