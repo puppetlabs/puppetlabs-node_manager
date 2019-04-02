@@ -155,6 +155,16 @@ class Puppet::Util::Nc_https
     JSON.parse(res.body)
   end
 
+  def get_nodes(name)
+    res = do_https("v1/nodes/#{name}", 'GET')
+    if res.code.to_i != 200
+      error_msg(res)
+      fail('Unable to get node history')
+    else
+      JSON.parse(res.body)
+    end
+  end
+
   private
 
   def do_https(endpoint, method = 'post', data = {})
