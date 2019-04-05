@@ -11,6 +11,7 @@
     * [update_classes](#update_classes)
 1. [Functions](#functions)
     * [node_groups()](#node_groups)
+    * [get_nodes()](#get_nodes)
 1. [Face](#face)
 1. [Things to do](#things-to-do)
 1. [Experimental](#experimental)
@@ -198,6 +199,49 @@ Retrieve all or one node_group and its data.
   }
 }
   ```
+
+_Type:_ rvalue
+
+### get_nodes()
+
+Retrieve historical info about a node's check-ins and classification, if check-in storage is enabled.
+
+`get_nodes(nodename)` will return:
+
+```puppet
+{
+  "name": "Deep Space 9",
+  "check_ins": [
+    {
+      "time": "2369-01-04T03:00:00Z",
+      "explanation": {
+        "53029cf7-2070-4539-87f5-9fc754a0f041": {
+          "value": true,
+          "form": [
+            "and",
+            {
+              "value": true,
+              "form": [">=", {"path": ["fact", "pressure hulls"], "value": "3"}, "1"]
+            },
+            {
+              "value": true,
+              "form": ["=", {"path": ["fact", "warp cores"], "value": "0"}, "0"]
+            },
+            {
+              "value": true,
+              "form": [">" {"path": ["fact", "docking ports"], "value": "18"}, "9"]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "transaction_uuid": "d3653a4a-4ebe-426e-a04d-dbebec00e97f"
+}
+```
+
+`get_nodes()` (without the nodename argument) is deprecated, but is included for coverage of the API.  It
+will return the same structure, but for all nodes with their historical check-in information.
 
 _Type:_ rvalue
 
