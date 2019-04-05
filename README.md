@@ -240,6 +240,9 @@ Retrieve historical info about a node's check-ins and classification, if check-i
 }
 ```
 
+`get_nodes()` (without the nodename argument) is deprecated, but is included for coverage of the API.  It
+will return the same structure, but for all nodes with their historical check-in information.
+
 _Type:_ rvalue
 
 ## Face

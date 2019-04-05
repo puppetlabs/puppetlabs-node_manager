@@ -156,10 +156,12 @@ class Puppet::Util::Nc_https
   end
 
   def get_nodes(name)
-    res = do_https("v1/nodes/#{name}", 'GET')
+    url_array = [ 'v1/nodes' ]
+    url_array << name if name
+    res = do_https(url_array.join('/'), 'GET')
     if res.code.to_i != 200
       error_msg(res)
-      fail('Unable to get node history')
+      fail('Unable to get nodes history')
     else
       JSON.parse(res.body)
     end
