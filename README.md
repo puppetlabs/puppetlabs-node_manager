@@ -269,7 +269,7 @@ ACTIONS:
   environments    Query environment sync status
   groups          List group information
   pin             Pin a node to a group
-  unpin           Unpin a node from all groups
+  unpin           Unpin a node from groups
 
 See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
 ```

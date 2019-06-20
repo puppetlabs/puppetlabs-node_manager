@@ -130,13 +130,22 @@ class Puppet::Util::Nc_https
   end
 
   def pin_node(node, group_id)
-    data = { 'nodes' => node, }
+    data = { 'nodes' => [node], }
     res  = do_https("v1/groups/#{group_id}/pin", 'POST', data)
-    require 'pry'; binding.pry
     if res.code.to_i != 204
       error_msg(res)
     else
-      JSON.parse(res.body)
+      (JSON.parse(res.body) if res.body) || true
+    end
+  end
+
+  def unpin_node(node, group_id)
+    data = { 'nodes' => [node], }
+    res  = do_https("v1/groups/#{group_id}/unpin", 'POST', data)
+    if res.code.to_i != 204
+      error_msg(res)
+    else
+      (JSON.parse(res.body) if res.body) || true
     end
   end
 
@@ -146,7 +155,7 @@ class Puppet::Util::Nc_https
     if res.code.to_i != 200
       error_msg(res)
     else
-      JSON.parse(res.body)
+      (JSON.parse(res.body) if res.body) || true
     end
   end
 
