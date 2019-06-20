@@ -1,4 +1,4 @@
-# node_manager [![Build Status](https://travis-ci.org/WhatsARanjit/prosvcs-node_manager.svg)](https://travis-ci.org/WhatsARanjit/prosvcs-node_manager)
+# node_manager [![Build Status](https://travis-ci.org/WhatsARanjit/puppet-node_manager.svg?branch=master)](https://travis-ci.org/WhatsARanjit/puppet-node_manager)
 
 #### Table of Contents
 
