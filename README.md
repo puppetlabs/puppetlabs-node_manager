@@ -7,6 +7,7 @@
 1. [Authentication](#authentication)
 1. [Types](#types)
     * [Node_group](#node_group)
+1. [Usage in Bolt Plans](#usage-in-bolt-plans)
 1. [Tasks](#tasks)
     * [update_classes](#update_classes)
 1. [Functions](#functions)
@@ -135,6 +136,34 @@ This parameter is supported for PE >=2017.3.x.
 
   Default (empty hash): `{}`
 
+## Usage in Bolt Plans
+
+When using node\_group types in Bolt plans, it is necessary to dynamically
+configure the node\_manager.yaml configuration file. This can be accomplished
+using the provided node\_manager::config\_path() function and the Deferred
+type. Note that this requires Puppet 6 or newer.
+
+Example:
+
+```puppet
+apply($master_target) {
+  file { 'node_manager.yaml':
+    ensure   => file,
+    mode     => '0644',
+    path     => Deferred('node_manager::config_path'),
+    content  => epp('node_manager/node_manager.yaml.epp', {
+      server => $master_certname,
+    }),
+  }
+
+  node_group { 'Example group':
+    ensure  => present,
+    parent  => 'All Nodes',
+    require => File['node_manager.yaml'],
+  }
+}
+```
+
 ## Tasks
 
 ### update_classes
@@ -244,6 +273,14 @@ Retrieve historical info about a node's check-ins and classification, if check-i
 will return the same structure, but for all nodes with their historical check-in information.
 
 _Type:_ rvalue
+
+### node\_manager::config\_path()
+
+Return the full path to the node\_manager.yaml file node\_manager will consult
+for settings needed to connect to the classifier service. This function is
+intended to be used in a Deferred data type. This can be useful when the path
+cannot be known prior to catalog application, such as when used in a Bolt plan
+apply block.
 
 ## Face
 
