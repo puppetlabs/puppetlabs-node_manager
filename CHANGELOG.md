@@ -1,3 +1,13 @@
+## 2019-06-20 - Release 0.7.2
+
+### Summary
+
+- `Update to allow get_nodes() without argument`
+
+#### Bugfixes
+
+- Unpin actions had an errant pry statement
+
 ## 2018-03-15 - Release 0.7.1
 
 ## Summary

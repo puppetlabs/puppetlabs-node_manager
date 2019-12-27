@@ -1,4 +1,4 @@
-# node_manager [![Build Status](https://travis-ci.org/WhatsARanjit/prosvcs-node_manager.svg)](https://travis-ci.org/WhatsARanjit/prosvcs-node_manager)
+# node_manager [![Build Status](https://travis-ci.org/WhatsARanjit/puppet-node_manager.svg?branch=master)](https://travis-ci.org/WhatsARanjit/puppet-node_manager)
 
 #### Table of Contents
 
@@ -269,7 +269,7 @@ ACTIONS:
   environments    Query environment sync status
   groups          List group information
   pin             Pin a node to a group
-  unpin           Unpin a node from all groups
+  unpin           Unpin a node from groups
 
 See 'puppet man node_manager' or 'man puppet-node_manager' for full help.
 ```
