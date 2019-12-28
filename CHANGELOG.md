@@ -1,3 +1,9 @@
+## 2019-12-27 - Release 0.7.3
+
+## Summary
+
+- Updating version to be compatible with Puppet 5
+
 ## 2019-06-20 - Release 0.7.2
 
 ### Summary
