@@ -50,7 +50,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 3.7.1 < 6.0.0"
+      "version_requirement": ">= 3.7.1 < 7.0.0"
     }
   ],
   "description": "Node_manager module"
