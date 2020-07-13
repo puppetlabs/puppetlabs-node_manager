@@ -71,7 +71,7 @@ node_group { 'PE MCollective':
   classes              => {'puppet_enterprise::profile::mcollective::agent' => {}},
   environment          => 'production',
   id                   => '4cdec347-20c6-46d7-9658-7189c1537ae9',
-  override_environment => 'false',
+  override_environment => false,
   parent               => 'PE Infrastructure',
   rule                 => ['and', ['~', ['fact', 'pe_version'], '.+']],
 }
