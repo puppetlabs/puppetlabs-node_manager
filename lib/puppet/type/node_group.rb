@@ -6,6 +6,11 @@ Puppet::Type.newtype(:node_group) do
   newparam(:name, :namevar => true) do
     desc 'This is the common name for the node group'
   end
+  newparam(:purge_behavior) do
+    desc 'Whether or not to remove data or class parameters not specified'
+    newvalues(:none, :data, :classes, :all)
+    defaultto :all
+  end
   newproperty(:id) do
     desc 'The ID of the group'
     validate do |value|
@@ -45,6 +50,24 @@ Puppet::Type.newtype(:node_group) do
     munge do |value|
       PuppetX::Node_manager::Common.sort_hash(value)
     end
+    def should
+      case @resource[:purge_behavior]
+      when :classes, :all
+        super
+      else
+        a = @resource.property(:data).retrieve || {}
+        b = shouldorig.first
+        merged = (a.keys + b.keys).uniq.reduce({}) do |memo,key|
+          memo[key] = a[key] && b[key] ? a[key].merge(b[key]) : a[key] || b[key]
+          memo
+        end
+        PuppetX::Node_manager::Common.sort_hash(merged)
+      end
+    end
+    def insync?(is)
+      [is, should].map { |val| PuppetX::Node_manager::Common.sort_hash(val) }
+                  .reduce { |a,b| a == b }
+    end
   end
   newproperty(:data) do
     desc 'Data applied to this group'
@@ -55,6 +78,24 @@ Puppet::Type.newtype(:node_group) do
     # Need to deep sort hashes so they be evaluated equally
     munge do |value|
       PuppetX::Node_manager::Common.sort_hash(value)
+    end
+    def should
+      case @resource[:purge_behavior]
+      when :data, :all
+        super
+      else
+        a = @resource.property(:data).retrieve || {}
+        b = shouldorig.first
+        merged = (a.keys + b.keys).uniq.reduce({}) do |memo,key|
+          memo[key] = a[key] && b[key] ? a[key].merge(b[key]) : a[key] || b[key]
+          memo
+        end
+        PuppetX::Node_manager::Common.sort_hash(merged)
+      end
+    end
+    def insync?(is)
+      [is, should].map { |val| PuppetX::Node_manager::Common.sort_hash(val) }
+                  .reduce { |a,b| a == b }
     end
   end
   newproperty(:description) do

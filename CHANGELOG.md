@@ -1,3 +1,7 @@
+## Unreleased
+
+- Add `purge_behavior` parameter to node\_group resource type
+
 ## 2019-12-27 - Release 0.7.3
 
 ## Summary
