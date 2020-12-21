@@ -55,12 +55,9 @@ Puppet::Type.newtype(:node_group) do
       when :classes, :all
         super
       else
-        a = @resource.property(:data).retrieve || {}
+        a = @resource.property(:classes).retrieve || {}
         b = shouldorig.first
-        merged = (a.keys + b.keys).uniq.reduce({}) do |memo,key|
-          memo[key] = a[key] && b[key] ? a[key].merge(b[key]) : a[key] || b[key]
-          memo
-        end
+        merged = a.merge(b) { |k, x, y| x.merge(y) }
         PuppetX::Node_manager::Common.sort_hash(merged)
       end
     end
@@ -86,10 +83,7 @@ Puppet::Type.newtype(:node_group) do
       else
         a = @resource.property(:data).retrieve || {}
         b = shouldorig.first
-        merged = (a.keys + b.keys).uniq.reduce({}) do |memo,key|
-          memo[key] = a[key] && b[key] ? a[key].merge(b[key]) : a[key] || b[key]
-          memo
-        end
+        merged = a.merge(b) { |k, x, y| x.merge(y) }
         PuppetX::Node_manager::Common.sort_hash(merged)
       end
     end
