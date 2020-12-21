@@ -71,10 +71,19 @@ describe 'node_groups' do
   }
 
   before do
-    YAML.stubs(:load_file).returns({
-      'server' => 'stubserver',
-      'port'   => '8080',
-    })
+    allow(YAML).to(receive(:load_file))
+               .with('/dev/null/classifier.yaml')
+               .and_return({'server' => 'stubserver', 'port' => '8080'})
+
+    allow(File).to receive(:read).and_call_original
+    allow(File).to receive(:read).with(%r{/dev/null/ssl/}).and_return('helloworld')
+
+    allow(OpenSSL::X509::Certificate).to(receive(:new))
+                                     .and_return(double("Certificate", :save => true))
+
+    allow(OpenSSL::PKey::RSA).to(receive(:new))
+                             .and_return(double("Key", :save => true))
+
     stub_request(
       :get,
       'https://stubserver:8080/classifier-api/v1/groups',
@@ -82,9 +91,6 @@ describe 'node_groups' do
       :status => 200,
       :body   => groups_response
     )
-    File.stubs(:read).returns('helloworld')
-    OpenSSL::X509::Certificate.stubs(:new) {mock_model(OpenSSL::X509::Certificate, :save => true)}
-    OpenSSL::PKey::RSA.stubs(:new) {mock_model(OpenSSL::PKey::RSA, :save => true)}
   end
 
   describe 'without an argument' do

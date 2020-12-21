@@ -1,11 +1,5 @@
 require 'spec_helper'
 
-# This should be moved to spec_helper when/if Mocha is verified removed from
-# all other tests
-RSpec.configure do |c|
-  c.mock_framework = :rspec
-end
-
 describe Puppet::Type.type(:node_group) do
   it "should allow agent-specified environment" do
     expect {
