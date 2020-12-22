@@ -184,4 +184,47 @@ describe Puppet::Type.type(:node_group) do
     end
   end
 
+  describe ".insync? for data, classes" do
+    let(:hash) do
+      {
+        'class1' => { 'param1' => 'value1',
+                      'param2' => 'value2' },
+        'class2' => { 'param1' => 'value1',
+                      'param2' => 'value2' },
+        'class3' => { 'param1' => 'value1',
+                      'param2' => 'value2' },
+      }
+    end
+    let(:resource) do
+      described_class.new({
+        :name        => 'test_group',
+        :environment => 'test_env',
+        :classes     => hash,
+        :data        => hash,
+      })
+    end
+
+    before(:each) do
+      allow(resource.property(:data)).to receive(:should).and_return(hash)
+      allow(resource.property(:classes)).to receive(:should).and_return(hash)
+    end
+
+    it 'is insync when `is` and `should` are identical' do
+      expect(resource.property(:data).insync?(hash)).to eq(true)
+      expect(resource.property(:classes).insync?(hash)).to eq(true)
+    end
+
+    it 'is insync when `is` and `should` are identical but have different ordering' do
+      reverse_hash = hash.to_a.map{ |i| [i[0], i[1].to_a.reverse.to_h] }.reverse.to_h
+      expect(resource.property(:data).insync?(reverse_hash)).to eq(true)
+      expect(resource.property(:classes).insync?(reverse_hash)).to eq(true)
+    end
+
+    it 'is not insync when `is` is only a subset of `should`' do
+      subset = hash.select { |k| k != 'class2' }
+      expect(resource.property(:data).insync?(subset)).to eq(false)
+      expect(resource.property(:classes).insync?(subset)).to eq(false)
+    end
+  end
+
 end

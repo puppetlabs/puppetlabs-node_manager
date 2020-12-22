@@ -61,10 +61,6 @@ Puppet::Type.newtype(:node_group) do
         PuppetX::Node_manager::Common.sort_hash(merged)
       end
     end
-    def insync?(is)
-      [is, should].map { |val| PuppetX::Node_manager::Common.sort_hash(val) }
-                  .reduce { |a,b| a == b }
-    end
   end
   newproperty(:data) do
     desc 'Data applied to this group'
@@ -86,10 +82,6 @@ Puppet::Type.newtype(:node_group) do
         merged = a.merge(b) { |k, x, y| x.merge(y) }
         PuppetX::Node_manager::Common.sort_hash(merged)
       end
-    end
-    def insync?(is)
-      [is, should].map { |val| PuppetX::Node_manager::Common.sort_hash(val) }
-                  .reduce { |a,b| a == b }
     end
   end
   newproperty(:description) do
