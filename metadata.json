@@ -1,6 +1,6 @@
 {
   "name": "WhatsARanjit-node_manager",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "author": "WhatsARanjit",
   "summary": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",
@@ -20,14 +20,16 @@
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
         "6",
-        "7"
+        "7",
+        "8"
       ]
     },
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
         "6",
-        "7"
+        "7",
+        "8"
       ]
     },
     {
@@ -43,14 +45,15 @@
         "10.04",
         "12.04",
         "14.04",
-        "16.06"
+        "16.06",
+        "18.04"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 3.7.1 < 7.0.0"
+      "version_requirement": ">= 3.7.1 < 8.0.0"
     }
   ],
   "description": "Node_manager module"

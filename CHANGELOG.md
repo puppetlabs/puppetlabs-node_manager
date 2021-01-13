@@ -1,10 +1,13 @@
-## Unreleased
+## 2021-01-12 - Release 0.7.4
+
+### Summary
 
 - Add `purge_behavior` parameter to node\_group resource type
+- Cleaned up Gemfile
 
 ## 2019-12-27 - Release 0.7.3
 
-## Summary
+### Summary
 
 - Updating version to be compatible with Puppet 5
 
