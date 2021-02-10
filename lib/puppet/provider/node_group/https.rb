@@ -78,7 +78,7 @@ Puppet::Type.type(:node_group).provide(:https) do
     # Only passing parameters that are given
     send_data = Hash.new
     @resource.original_parameters.each do |k,v|
-      next if [:ensure, :provider].include? k
+      next if [:ensure, :provider, :purge_behavior].include? k
       next if @resource.parameter(k).metaparam?
       key = k.to_s
       # key changed for usability
