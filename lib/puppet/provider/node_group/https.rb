@@ -77,14 +77,13 @@ Puppet::Type.type(:node_group).provide(:https) do
     @noflush = true
     # Only passing parameters that are given
     send_data = Hash.new
-    @resource.original_parameters.each do |k,v|
-      next if [:ensure, :provider, :purge_behavior].include? k
-      next if @resource.parameter(k).metaparam?
-      key = k.to_s
+    @resource.properties.each do |property|
+      next if [:ensure].include? property.name
+      key = property.to_s
       # key changed for usability
       key = 'environment_trumps' if key == 'override_environment'
       key = 'config_data'        if key == 'data'
-      send_data[key] = v
+      send_data[key] = property.value
     end
     # namevar may not be in this hash
     send_data['name'] = @resource[:name] unless send_data['name']

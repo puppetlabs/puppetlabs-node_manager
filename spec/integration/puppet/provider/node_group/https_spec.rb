@@ -27,15 +27,15 @@ describe Puppet::Type.type(:node_group).provider(:https) do
   EOS
 
   HCREATE_REQUEST = {
-    "environment_trumps" => "false",
+    "environment_trumps" => false,
     "parent"             => "00000000-0000-4000-8000-000000000000",
-    "rule"               => ["or", ["=", "name", "master.puppetlabs.vm"]],
-    "environment"        => "stubenvironment",
-    "classes"            => {"puppet_enterprise::profile::amq::broker" => {}},
     "variables"          => {
       "stubkey"  => "stubvalue",
       "stubkey2" => "stubvalue2"
     },
+    "rule"               => ["or", ["=", "name", "master.puppetlabs.vm"]],
+    "environment"        => "stubenvironment",
+    "classes"            => {"puppet_enterprise::profile::amq::broker" => {}},
     "description"        => "Sample message",
     "name"               => "stub_name",
   }.to_json

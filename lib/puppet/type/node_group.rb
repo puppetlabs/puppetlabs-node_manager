@@ -1,4 +1,5 @@
 require 'puppet_x/node_manager/common'
+require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:node_group) do
   desc 'The node_group type creates and manages node groups for the PE Node Manager'
@@ -17,9 +18,8 @@ Puppet::Type.newtype(:node_group) do
       fail("ID is read-only")
     end
   end
-  newproperty(:override_environment) do
+  newproperty(:override_environment, :boolean => true, :parent => Puppet::Property::Boolean) do
     desc 'Override parent environments'
-    newvalues(:false, :true)
   end
   newproperty(:parent) do
     desc 'The ID of the parent group'
