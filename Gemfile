@@ -23,8 +23,6 @@ group :development do
   gem "guard-rake"
 end
 
-source 'https://rubygems.org'
-
 gem 'puppet', nil || ENV['PUPPET_VERSION']
 gem 'puppetlabs_spec_helper'
 gem 'webmock'

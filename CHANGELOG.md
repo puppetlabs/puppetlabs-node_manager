@@ -1,3 +1,11 @@
+## 2021-03-11 - Release 0.7.5
+
+### Summary
+
+- Fix `purge_behavior` bug which prevented node group creation when using this parameter
+- Validate user input for the `override_environment` parameter. This parameter must be boolean to be valid. Previously, no error was raised until the type was synced. Now, the input will be validated early. Note that boolean-coerced strings such as "true", "false" are permitted.
+- Additional Gemfile cleanup
+
 ## 2021-01-12 - Release 0.7.4
 
 ### Summary
