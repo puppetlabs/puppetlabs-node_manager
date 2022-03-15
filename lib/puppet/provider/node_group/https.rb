@@ -89,6 +89,8 @@ Puppet::Type.type(:node_group).provide(:https) do
     send_data['name'] = @resource[:name] unless send_data['name']
     # Passing an empty hash in the type results in undef
     send_data['classes'] = {} unless send_data['classes']
+    # Ensure environment_trumps is a boolean
+    send_data['environment_trumps'] = Puppet::Coercion.boolean(send_data['environment_trumps']) if send_data['environment_trumps']
 
     send_data['parent'] = '00000000-0000-4000-8000-000000000000' if !send_data['parent']
     unless send_data['parent'] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
