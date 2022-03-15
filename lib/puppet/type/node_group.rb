@@ -18,8 +18,11 @@ Puppet::Type.newtype(:node_group) do
       fail("ID is read-only")
     end
   end
-  newproperty(:override_environment, :boolean => true, :parent => Puppet::Property::Boolean) do
+  newproperty(:override_environment, :boolean => true) do
     desc 'Override parent environments'
+    munge do |value|
+      Puppet::Coercion.boolean(value).to_s.to_sym
+    end
   end
   newproperty(:parent) do
     desc 'The ID of the parent group'
