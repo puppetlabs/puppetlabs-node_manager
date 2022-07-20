@@ -35,7 +35,22 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:rule, :array_matching => :all) do
     desc 'Match conditions for this group'
-    defaultto []
+
+    # check for fact rule in deep array
+    def factcheck(rulecheck)
+      rulecheck.each_with_index {|x, i|
+        if x == "fact" and i == 0
+          return true
+        end
+        if x.kind_of?(Array)
+          if factcheck(x)
+            return true
+          end
+        end
+      }
+      false
+    end
+
     def should
       case @resource[:purge_behavior]
       when :rule, :all
@@ -43,26 +58,63 @@ Puppet::Type.newtype(:node_group) do
       else
         a = shouldorig
         b = @resource.property(:rule).retrieve || {}
+        borig = b.map(&:clone)
+        btmp = b.map(&:clone)
         # check if the node classifer has any rules defined before attempting merge.
         if b.length >= 2
           if b[0] == "or" and b[1][0] == "or" or b[1][0] == "and"
             # We are merging both rules and pinned nodes
-            rules = (b[1] + a[1].drop(1)).uniq
-            pinned = (a[2,a.length] + b[2,b.length]).uniq
-            b[1] = rules
-            merged = (b + pinned).uniq
+            if a[0] == "or" and a[1][0] == "or" or a[1][0] == "and"
+              # a has rules to merge
+              rules = (btmp[1] + a[1].drop(1)).uniq
+              btmp[1] = rules
+              pinned = (a[2,a.length] + btmp[2,btmp.length]).uniq
+              merged = (btmp + pinned).uniq
+            elsif a[0] == "and" or a[0] == "or" and factcheck(a)
+              # a only has rules to merge
+              rules = (btmp[1] + a.drop(1)).uniq
+              btmp[1] = rules
+              merged = btmp
+            else
+              pinned = (a[1,a.length] + btmp[2,btmp.length]).uniq
+              merged = (btmp + pinned).uniq
+            end
           elsif a[0] == "or" and a[1][0] == "or" or a[1][0] == "and"
             # We are merging both rules and pinned nodes
             rules = a[1] # no rules to merge on B side
-            pinned = (a[2,a.length] + b[2,b.length]).uniq
+            pinned = (a[2,a.length] + b[1,b.length]).uniq
             merged = (a + pinned).uniq
+          elsif b[0] == "and" or b[0] == "or" and factcheck(b)
+            # b only has fact rules
+            if a[0] == "or" and not factcheck(a)
+              # a only has pinned nodes
+              rules = btmp
+              temp = ['or']
+              temp[1] = btmp
+              merged = (temp + a[1,a.length]).uniq
+            else
+              # a only has rules
+              merged = (b + a.drop(1)).uniq
+            end
+          elsif b[0] == "or" and b[1][1] == "name"
+            # b only has pinned nodes
+            if a[0] == "or" and not factcheck(a)
+              # a only has pinned nodes
+              merged = (a + b.drop(1)).uniq
+            else
+              # a only has rules
+              temp = ['or']
+              temp[1] = a
+              merged = (temp + btmp[1,btmp.length]).uniq
+            end
           else
             # We are only doing rules OR pinned nodes
+            puts "default rule - might fail - Pullout before PR to main project"
             merged = (a + b.drop(1)).uniq
           end
-          if merged == b
+          if merged == borig
             # values are the same, returning orginal value"
-            b
+            borig
           else
             merged
           end
