@@ -35,91 +35,74 @@ Puppet::Type.newtype(:node_group) do
   end
   newproperty(:rule, :array_matching => :all) do
     desc 'Match conditions for this group'
-
-    # check for fact rule in deep array
-    def factcheck(rulecheck)
-      rulecheck.each_with_index {|x, i|
-        if x == "fact" and i == 0
-          return true
-        end
-        if x.kind_of?(Array)
-          if factcheck(x)
-            return true
-          end
-        end
-      }
-      false
-    end
-
     def should
       case @resource[:purge_behavior]
       when :rule, :all
         super
       else
-        a = shouldorig
-        b = @resource.property(:rule).retrieve || {}
-        borig = b.map(&:clone)
-        btmp = b.map(&:clone)
+        a = @resource.property(:rule).retrieve || {}
+        b = shouldorig
+        aorig = a.map(&:clone)
+        atmp = a.map(&:clone)
         # check if the node classifer has any rules defined before attempting merge.
-        if b.length >= 2
-          if b[0] == "or" and b[1][0] == "or" or b[1][0] == "and"
-            # We are merging both rules and pinned nodes
-            if a[0] == "or" and a[1][0] == "or" or a[1][0] == "and"
-              # a has rules to merge
-              rules = (btmp[1] + a[1].drop(1)).uniq
-              btmp[1] = rules
-              pinned = (a[2,a.length] + btmp[2,btmp.length]).uniq
-              merged = (btmp + pinned).uniq
-            elsif a[0] == "and" or a[0] == "or" and factcheck(a)
-              # a only has rules to merge
-              rules = (btmp[1] + a.drop(1)).uniq
-              btmp[1] = rules
-              merged = btmp
+        if a.length >= 2
+          if a[0] == "or" and a[1][0] == "or" or a[1][0] == "and"
+            # Merging both rules and pinned nodes
+            if b[0] == "or" and b[1][0] == "or" or b[1][0] == "and"
+              # b has rules to merge
+              rules = (atmp[1] + b[1].drop(1)).uniq
+              atmp[1] = rules
+              pinned = (b[2,b.length] + atmp[2,atmp.length]).uniq
+              merged = (atmp + pinned).uniq
+            elsif b[0] == "and" or b[0] == "or" and PuppetX::Node_manager::Common.factcheck(b)
+              # b only has rules to merge
+              rules = (atmp[1] + b.drop(1)).uniq
+              atmp[1] = rules
+              merged = atmp
             else
-              pinned = (a[1,a.length] + btmp[2,btmp.length]).uniq
-              merged = (btmp + pinned).uniq
+              pinned = (b[1,b.length] + atmp[2,atmp.length]).uniq
+              merged = (atmp + pinned).uniq
             end
-          elsif a[0] == "or" and a[1][0] == "or" or a[1][0] == "and"
-            # We are merging both rules and pinned nodes
-            rules = a[1] # no rules to merge on B side
-            pinned = (a[2,a.length] + b[1,b.length]).uniq
-            merged = (a + pinned).uniq
-          elsif b[0] == "and" or b[0] == "or" and factcheck(b)
-            # b only has fact rules
-            if a[0] == "or" and not factcheck(a)
-              # a only has pinned nodes
-              rules = btmp
+          elsif b[0] == "or" and b[1][0] == "or" or b[1][0] == "and"
+            # Merging both rules and pinned nodes
+            rules = b[1] # no rules to merge on a side
+            pinned = (b[2,b.length] + a[1,a.length]).uniq
+            merged = (b + pinned).uniq
+          elsif a[0] == "and" or a[0] == "or" and PuppetX::Node_manager::Common.factcheck(a)
+            # a only has fact rules
+            if b[0] == "or" and not PuppetX::Node_manager::Common.factcheck(b)
+              # b only has pinned nodes
+              rules = atmp
               temp = ['or']
-              temp[1] = btmp
-              merged = (temp + a[1,a.length]).uniq
+              temp[1] = atmp
+              merged = (temp + b[1,b.length]).uniq
             else
-              # a only has rules
-              merged = (b + a.drop(1)).uniq
-            end
-          elsif b[0] == "or" and b[1][1] == "name"
-            # b only has pinned nodes
-            if a[0] == "or" and not factcheck(a)
-              # a only has pinned nodes
+              # b only has rules
               merged = (a + b.drop(1)).uniq
+            end
+          elsif a[0] == "or" and a[1][1] == "name"
+            # a only has pinned nodes
+            if b[0] == "or" and not PuppetX::Node_manager::Common.factcheck(b)
+              # b only has pinned nodes
+              merged = (b + a.drop(1)).uniq
             else
-              # a only has rules
+              # b only has rules
               temp = ['or']
-              temp[1] = a
-              merged = (temp + btmp[1,btmp.length]).uniq
+              temp[1] = b
+              merged = (temp + atmp[1,atmp.length]).uniq
             end
           else
-            # We are only doing rules OR pinned nodes
-            puts "default rule - might fail - Pullout before PR to main project"
-            merged = (a + b.drop(1)).uniq
+            # default fall back.
+            merged = (b + a.drop(1)).uniq
           end
-          if merged == borig
+          if merged == aorig
             # values are the same, returning orginal value"
-            borig
+            aorig
           else
             merged
           end
         else
-          a
+          b
         end
       end
     end
