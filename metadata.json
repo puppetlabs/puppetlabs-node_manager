@@ -2,7 +2,7 @@
   "name": "WhatsARanjit-node_manager",
   "version": "0.7.5",
   "author": "WhatsARanjit",
-  "summary": "Create and manage PE Console node groups as resources.",
+  "description": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",
   "source": "https://github.com/WhatsARanjit/puppet-node_manager",
   "project_page": "https://github.com/WhatsARanjit/puppet-node_manager",
@@ -55,6 +55,5 @@
       "name": "puppet",
       "version_requirement": ">= 3.7.1 < 8.0.0"
     }
-  ],
-  "description": "Node_manager module"
+  ]
 }
