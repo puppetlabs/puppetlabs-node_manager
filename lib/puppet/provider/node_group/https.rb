@@ -210,7 +210,7 @@ Puppet::Type.type(:node_group).provide(:https) do
         _current   = current.is_a?(Hash) ? current[k] : {}
         newhash[k] = add_nulls(_current, new[k])
       else
-        newhash[k] = new[k] || nil
+        newhash[k] = new[k] 
       end
     end
 
