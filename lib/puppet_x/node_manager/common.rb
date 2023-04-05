@@ -30,4 +30,19 @@ module PuppetX::Node_manager::Common
     end
     newhash
   end
+
+  # check for fact rules in deep array
+  def self.factcheck(rulecheck)
+    rulecheck.each_with_index {|x, i|
+    if x == "fact" and i == 0
+      return true
+    end
+    if x.kind_of?(Array)
+      if factcheck(x)
+        return true
+      end
+    end
+    }
+    false
+  end
 end

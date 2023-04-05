@@ -137,11 +137,11 @@ This parameter is supported for PE >=2017.3.x.
 
 * `purge_behavior`
 
-  Defines how purging of classification or data will be handled. By default, or when set to `all`, the node\_group resource will ensure classes and data are matched exactly, and remove any values not described by the resource. When set to `none`, the node\_group resource will ensure data and classes described are present with the prescribed values, but will not remove other classification, or other data, present in the node group. The `data` setting purges only data values, and the `classes` setting purges only classes values.
+  Defines how purging of classification, data and rules will be handled. By default, or when set to `all`, the node\_group resource will ensure classes, data and rules are matched exactly, and remove any values not described by the resource. When set to `none`, the node\_group resource will ensure data, classes and rules described are present with the prescribed values, but will not remove other classification, or other data, present in the node group. The `data` setting purges only data values, the `classes` setting purges only classes values and the `rule` setting purges only rule values. In case of conflict with the node classifiers `Nodes must match all rules.` and `Nodes may match any rule.` radio buttons. The node classifier takes precedence over defined node_group code.
 
   Default: `all`
 
-  Values: `all`, `data`, `classes`, `none`
+  Values: `all`, `data`, `classes`, `rule`, `none`
 
 ## Tasks
 
