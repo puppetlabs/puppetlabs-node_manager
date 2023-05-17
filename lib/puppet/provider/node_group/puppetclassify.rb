@@ -1,16 +1,15 @@
 require 'puppet/util/node_groups'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
-  confine :feature => :puppetclassify
+  confine feature: :puppetclassify
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
     @property_flush = {
       'state' => {},
       'attrs' => {},
     }
   end
-
 
   def self.classifier
     @classifier ||= initialize_client
@@ -24,15 +23,15 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   # Decided to use override_environment instead
   def self.friendly_name
     {
-      :classes            => 'classes',
-      :environment        => 'environment',
-      :environment_trumps => 'override_environment',
-      :id                 => 'id',
-      :name               => 'name',
-      :parent             => 'parent',
-      :rule               => 'rule',
-      :variables          => 'variables',
-      :description        => 'description',
+      classes: 'classes',
+      environment: 'environment',
+      environment_trumps: 'override_environment',
+      id: 'id',
+      name: 'name',
+      parent: 'parent',
+      rule: 'rule',
+      variables: 'variables',
+      description: 'description',
     }
   end
 
@@ -40,7 +39,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     $ngs = classifier.groups.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
-      friendly_name.each do |property,friendly|
+      friendly_name.each do |property, friendly|
         # Replace parent ID with string name
         if friendly == 'parent'
           gindex = get_name_index_from_id(group[property.to_s])
@@ -60,7 +59,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     deprecation_warning('This provider is being deprecated.  See https provider at https://github.com/WhatsARanjit/prosvcs-node_manager/blob/https_provider/HTTPS.md')
     ngs = instances
     resources.keys.each do |group|
-      if provider = ngs.find{ |g| g.name == group }
+      if provider = ngs.find { |g| g.name == group }
         resources[group].provider = provider
       end
     end
@@ -75,8 +74,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   def create
     @noflush = true
     # Only passing parameters that are given
-    send_data = Hash.new
-    @resource.original_parameters.each do |k,v|
+    send_data = {}
+    @resource.original_parameters.each do |k, v|
       next if k == :ensure
       next if @resource.parameter(k).metaparam?
       key = k.to_s
@@ -89,8 +88,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     # Passing an empty hash in the type results in undef
     send_data['classes'] = {} unless send_data['classes']
 
-    send_data['parent'] = '00000000-0000-4000-8000-000000000000' if !send_data['parent']
-    unless send_data['parent'] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+    send_data['parent'] = '00000000-0000-4000-8000-000000000000' unless send_data['parent']
+    unless %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(send_data['parent'])
       gindex = get_id_index_from_name(send_data['parent'])
       if gindex
         send_data['parent'] = $ngs[gindex]['id']
@@ -107,13 +106,12 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
         end
       end
       # Add placeholder for $ngs lookups
-      $ngs << { "name" => send_data['name'], "id" => resp }
+      $ngs << { 'name' => send_data['name'], 'id' => resp }
     else
-      fail("puppetclassify was not able to create group")
+      raise('puppetclassify was not able to create group')
     end
 
     exists? ? (return true) : (return false)
-
   end
 
   def destroy
@@ -121,7 +119,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     begin
       self.class.classifier.groups.delete_group(@property_hash[:id])
     rescue Exception => e
-      fail(e.message)
+      raise(e.message)
       debug(e.backtrace.inspect)
     else
       @property_hash.clear
@@ -131,7 +129,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   # If ID is given, translate to string name
   def parent
-    if @resource[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+    if %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(@resource[:parent])
       gindex = self.class.get_name_index_from_id(@resource[:parent])
       $ngs[gindex]['name']
     else
@@ -139,10 +137,10 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     end
   end
 
-  friendly_name.each do |property,friendly|
+  friendly_name.each do |property, friendly|
     define_method "#{friendly}=" do |value|
       if property == :parent
-        if value =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+        if %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(value)
           @property_flush['attrs'][property.to_s] = value
         else
           gindex = $ngs.index { |i| i['name'] == value }
@@ -152,18 +150,18 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       elsif [:variables, :classes].include?(property)
         @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[property], value)
         # For logging return to original intended value
-        @resource[property] = value.select { |k,v| v != nil }
+        @resource[property] = value.select { |_k, v| !v.nil? }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
-        case value
-        when :true
-          @property_flush['attrs'][property.to_s] = true
-        when :false
-          @property_flush['attrs'][property.to_s] = false
-        else
-          @property_flush['attrs'][property.to_s] = value
-        end
+        @property_flush['attrs'][property.to_s] = case value
+                                                  when :true
+                                                    true
+                                                  when :false
+                                                    false
+                                                  else
+                                                    value
+                                                  end
       end
       @property_hash[friendly.to_sym] = value
     end
@@ -177,7 +175,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       begin
         self.class.classifier.groups.update_group(@property_flush['attrs'])
       rescue Exception => e
-        fail(e.message)
+        raise(e.message)
         debug(e.backtrace.inspect)
       else
       end
@@ -200,5 +198,4 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     difference.each { |k| nullhash[k] = nil }
     nullhash
   end
-
 end

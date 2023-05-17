@@ -2,16 +2,15 @@ require 'puppet/util/nc_https'
 require 'puppet_x/node_manager/common'
 
 Puppet::Type.type(:node_group).provide(:https) do
-  defaultfor :feature => :posix
+  defaultfor feature: :posix
 
-  def initialize(value={})
+  def initialize(value = {})
     super(value)
     @property_flush = {
       'state' => {},
       'attrs' => {},
     }
   end
-
 
   def self.classifier
     @classifier ||= initialize_client
@@ -25,16 +24,16 @@ Puppet::Type.type(:node_group).provide(:https) do
   # Decided to use override_environment instead
   def self.friendly_name
     {
-      :classes            => 'classes',
-      :environment        => 'environment',
-      :environment_trumps => 'override_environment',
-      :id                 => 'id',
-      :name               => 'name',
-      :parent             => 'parent',
-      :rule               => 'rule',
-      :variables          => 'variables',
-      :description        => 'description',
-      :config_data        => 'data',
+      classes: 'classes',
+      environment: 'environment',
+      environment_trumps: 'override_environment',
+      id: 'id',
+      name: 'name',
+      parent: 'parent',
+      rule: 'rule',
+      variables: 'variables',
+      description: 'description',
+      config_data: 'data',
     }
   end
 
@@ -42,7 +41,7 @@ Puppet::Type.type(:node_group).provide(:https) do
     $ngs = classifier.get_groups
     $ngs.collect do |group|
       ngs_hash = {}
-      friendly_name.each do |property,friendly|
+      friendly_name.each do |property, friendly|
         # Replace parent ID with string name
         if friendly == 'parent'
           gindex = get_name_index_from_id(group[property.to_s])
@@ -61,7 +60,7 @@ Puppet::Type.type(:node_group).provide(:https) do
   def self.prefetch(resources)
     ngs = instances
     resources.keys.each do |group|
-      if provider = ngs.find{ |g| g.name == group }
+      if provider = ngs.find { |g| g.name == group }
         resources[group].provider = provider
       end
     end
@@ -76,7 +75,7 @@ Puppet::Type.type(:node_group).provide(:https) do
   def create
     @noflush = true
     # Only passing parameters that are given
-    send_data = Hash.new
+    send_data = {}
     @resource.properties.each do |property|
       next if [:ensure].include? property.name
       key = property.to_s
@@ -92,8 +91,8 @@ Puppet::Type.type(:node_group).provide(:https) do
     # Ensure environment_trumps is a boolean
     send_data['environment_trumps'] = Puppet::Coercion.boolean(send_data['environment_trumps']) if send_data['environment_trumps']
 
-    send_data['parent'] = '00000000-0000-4000-8000-000000000000' if !send_data['parent']
-    unless send_data['parent'] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+    send_data['parent'] = '00000000-0000-4000-8000-000000000000' unless send_data['parent']
+    unless %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(send_data['parent'])
       gindex = get_id_index_from_name(send_data['parent'])
       if gindex
         send_data['parent'] = $ngs[gindex]['id']
@@ -109,10 +108,9 @@ Puppet::Type.type(:node_group).provide(:https) do
       end
     end
     # Add placeholder for $ngs lookups
-    $ngs << { "name" => send_data['name'], "id" => resp }
+    $ngs << { 'name' => send_data['name'], 'id' => resp }
 
     exists? ? (return true) : (return false)
-
   end
 
   def destroy
@@ -125,7 +123,7 @@ Puppet::Type.type(:node_group).provide(:https) do
 
   # If ID is given, translate to string name
   def parent
-    if @resource[:parent] =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+    if %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(@resource[:parent])
       gindex = self.class.get_name_index_from_id(@resource[:parent])
       $ngs[gindex]['name']
     else
@@ -147,10 +145,10 @@ Puppet::Type.type(:node_group).provide(:https) do
     @property_hash[:rule].nil? ? [''] : @property_hash[:rule]
   end
 
-  friendly_name.each do |property,friendly|
+  friendly_name.each do |property, friendly|
     define_method "#{friendly}=" do |value|
       if property == :parent
-        if value =~ /^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$/
+        if %r{^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$}.match?(value)
           @property_flush['attrs'][property.to_s] = value
         else
           gindex = $ngs.index { |i| i['name'] == value }
@@ -160,18 +158,18 @@ Puppet::Type.type(:node_group).provide(:https) do
       elsif [:variables, :classes, :config_data].include?(property)
         @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[friendly.to_sym], value)
         # For logging return to original intended value
-        @resource[friendly.to_sym] = value.select { |k,v| v != nil }
+        @resource[friendly.to_sym] = value.select { |_k, v| !v.nil? }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
-        case value
-        when :true
-          @property_flush['attrs'][property.to_s] = true
-        when :false
-          @property_flush['attrs'][property.to_s] = false
-        else
-          @property_flush['attrs'][property.to_s] = value
-        end
+        @property_flush['attrs'][property.to_s] = case value
+                                                  when :true
+                                                    true
+                                                  when :false
+                                                    false
+                                                  else
+                                                    value
+                                                  end
       end
       @property_hash[friendly.to_sym] = value
     end
@@ -197,12 +195,12 @@ Puppet::Type.type(:node_group).provide(:https) do
   end
 
   def add_nulls(current, new)
-    if current.is_a?(Hash)
-      allkeys = (current.keys + new.keys).uniq
-    else
-      allkeys = new.keys
-    end
-    newhash = Hash.new
+    allkeys = if current.is_a?(Hash)
+                (current.keys + new.keys).uniq
+              else
+                new.keys
+              end
+    newhash = {}
 
     allkeys.each do |k|
       if new[k].is_a?(Hash)
@@ -210,11 +208,10 @@ Puppet::Type.type(:node_group).provide(:https) do
         _current   = current.is_a?(Hash) ? current[k] : {}
         newhash[k] = add_nulls(_current, new[k])
       else
-        newhash[k] = new[k] 
+        newhash[k] = new[k]
       end
     end
 
     newhash
   end
-
 end

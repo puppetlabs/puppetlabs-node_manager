@@ -1,19 +1,18 @@
 require 'json'
 
 class Puppet::Util::Nc_https
-
   def initialize
-    if File.exists?("#{Puppet.settings['confdir']}/node_manager.yaml")
-      settings_file = "#{Puppet.settings['confdir']}/node_manager.yaml"
-    else
-      settings_file = "#{Puppet.settings['confdir']}/classifier.yaml"
-    end
+    settings_file = if File.exist?("#{Puppet.settings['confdir']}/node_manager.yaml")
+                      "#{Puppet.settings['confdir']}/node_manager.yaml"
+                    else
+                      "#{Puppet.settings['confdir']}/classifier.yaml"
+                    end
 
     begin
       nc_settings = YAML.load_file(settings_file)
       nc_settings = nc_settings.first if nc_settings.class == Array
     rescue
-      fail "Could not find file #{settings_file}"
+      raise "Could not find file #{settings_file}"
     else
       cl_server       = nc_settings['server'] || Puppet.settings['server']
       cl_port         = nc_settings['port']   || 4433
@@ -25,7 +24,7 @@ class Puppet::Util::Nc_https
       end
       Puppet.debug("classifier_url: #{@classifier_url}")
 
-      unless @token and ! @token.empty?
+      unless @token && !@token.empty?
         @ca_certificate_path = nc_settings['localcacert'] || Puppet.settings['localcacert']
         @certificate_path    = nc_settings['hostcert']    || Puppet.settings['hostcert']
         @private_key_path    = nc_settings['hostprivkey'] || Puppet.settings['hostprivkey']
@@ -37,7 +36,7 @@ class Puppet::Util::Nc_https
     res = do_https('v1/groups', 'GET')
     if res.code.to_i != 200
       error_msg(res)
-      fail('Unable to get node_group list')
+      raise('Unable to get node_group list')
     else
       JSON.parse(res.body)
     end
@@ -48,7 +47,7 @@ class Puppet::Util::Nc_https
     res = do_https(endpoint, 'POST', data)
     if res.code.to_i != 303
       error_msg(res)
-      fail("Unable to create node_group '#{data['name']}'")
+      raise("Unable to create node_group '#{data['name']}'")
     else
       new_UID = res['location'].split('/')[-1]
       Puppet.notice("New node_group '#{data['name']}' with ID '#{new_UID}'")
@@ -60,7 +59,7 @@ class Puppet::Util::Nc_https
     res = do_https("v1/groups/#{id}", 'DELETE')
     if res.code.to_i != 204
       error_msg(res)
-      fail("Unable to delete node_group '#{data['name']}'")
+      raise("Unable to delete node_group '#{data['name']}'")
     else
       true
     end
@@ -69,12 +68,12 @@ class Puppet::Util::Nc_https
   def update_group(data)
     # ISSUE 26
     # Add nil for empty rules
-    data = Hash[data.map { |k,v| v == [''] ? [k,nil] : [k,v] }]
+    data = Hash[data.map { |k, v| v == [''] ? [k, nil] : [k, v] }]
 
     res = do_https("v1/groups/#{data['id']}", 'POST', data)
     if res.code.to_i != 200
       error_msg(res)
-      fail("Unable to update node_group '#{data['name']}'")
+      raise("Unable to update node_group '#{data['name']}'")
     else
       true
     end
@@ -84,7 +83,7 @@ class Puppet::Util::Nc_https
     res = do_https('v1/import-hierarchy', 'POST', data)
     if res.code.to_i != 204
       error_msg(res)
-      fail('Unable to import node_groups')
+      raise('Unable to import node_groups')
     else
       true
     end
@@ -98,7 +97,7 @@ class Puppet::Util::Nc_https
     res = do_https(url_array.join('/'), 'GET')
     if res.code.to_i != 200
       error_msg(res)
-      fail JSON.parse(res.body)['msg']
+      raise JSON.parse(res.body)['msg']
     else
       JSON.parse(res.body)
     end
@@ -107,10 +106,10 @@ class Puppet::Util::Nc_https
   def update_classes(env = nil)
     url_array = ['v1/update-classes']
     url_array << "?environment=#{env}" if env
-    res  = do_https(url_array.join(''), 'POST')
+    res = do_https(url_array.join(''), 'POST')
     if res.code.to_i != 201
       error_msg(res)
-      fail('Unable to update classes')
+      raise('Unable to update classes')
     else
       true
     end
@@ -170,7 +169,7 @@ class Puppet::Util::Nc_https
     res = do_https(url_array.join('/'), 'GET')
     if res.code.to_i != 200
       error_msg(res)
-      fail('Unable to get nodes history')
+      raise('Unable to get nodes history')
     else
       JSON.parse(res.body)
     end
@@ -183,17 +182,17 @@ class Puppet::Util::Nc_https
     uri  = URI(url)
     http = Net::HTTP.new(uri.host, uri.port)
 
-    unless @token and ! @token.empty?
-      Puppet.debug('Using SSL authentication')
-      http.use_ssl     = true
-      http.cert        = OpenSSL::X509::Certificate.new(File.read @certificate_path)
-      http.key         = OpenSSL::PKey::RSA.new(File.read @private_key_path)
-      http.ca_file     = @ca_certificate_path
-      http.verify_mode = OpenSSL::SSL::VERIFY_CLIENT_ONCE
-    else
+    if @token && !@token.empty?
       Puppet.debug('Using token authentication')
       http.use_ssl     = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    else
+      Puppet.debug('Using SSL authentication')
+      http.use_ssl     = true
+      http.cert        = OpenSSL::X509::Certificate.new(File.read(@certificate_path))
+      http.key         = OpenSSL::PKey::RSA.new(File.read(@private_key_path))
+      http.ca_file     = @ca_certificate_path
+      http.verify_mode = OpenSSL::SSL::VERIFY_CLIENT_ONCE
     end
 
     req              = Net::HTTP.const_get(method.capitalize).new(uri.request_uri)
@@ -206,12 +205,13 @@ class Puppet::Util::Nc_https
     begin
       res = http.request(req)
     rescue Exception => e
-      fail(e.message)
+      raise(e.message)
       debug(e.backtrace.inspect)
     else
       res
     end
   end
+
   def error_msg(res)
     json = JSON.parse(res.body)
     kind = json['kind']

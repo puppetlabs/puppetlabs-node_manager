@@ -4,8 +4,8 @@ require 'webmock/rspec'
 
 describe 'node_groups' do
   describe 'input validation' do
-    it { is_expected.to run.with_params('', '', [], '', 'extra').and_raise_error(ArgumentError, /Function accepts a single String/i) }
-    it { is_expected.to run.with_params([]).and_raise_error(ArgumentError, /Function accepts a single String/i) }
+    it { is_expected.to run.with_params('', '', [], '', 'extra').and_raise_error(ArgumentError, %r{Function accepts a single String}i) }
+    it { is_expected.to run.with_params([]).and_raise_error(ArgumentError, %r{Function accepts a single String}i) }
   end
 
   groups_response = <<-EOS
@@ -70,34 +70,34 @@ describe 'node_groups' do
     }
   }
 
-  before do
+  before(:each) do
     allow(YAML).to(receive(:load_file))
                .with('/dev/null/classifier.yaml')
-               .and_return({'server' => 'stubserver', 'port' => '8080'})
+               .and_return({ 'server' => 'stubserver', 'port' => '8080' })
 
     allow(File).to receive(:read).and_call_original
     allow(File).to receive(:read).with(%r{/dev/null/ssl/}).and_return('helloworld')
 
     allow(OpenSSL::X509::Certificate).to(receive(:new))
-                                     .and_return(double("Certificate", :save => true))
+                                     .and_return(double('Certificate', save: true))
 
     allow(OpenSSL::PKey::RSA).to(receive(:new))
-                             .and_return(double("Key", :save => true))
+                             .and_return(double('Key', save: true))
 
     stub_request(
       :get,
       'https://stubserver:8080/classifier-api/v1/groups',
     ).to_return(
-      :status => 200,
-      :body   => groups_response
+      status: 200,
+      body: groups_response,
     )
   end
 
   describe 'without an argument' do
-    it { should run.with_params().and_return(hashified) }
+    it { is_expected.to run.with_params.and_return(hashified) }
   end
 
   describe 'with 1 String argument' do
-    it { should run.with_params('All Nodes').and_return({ 'All Nodes' => hashified['All Nodes']}) }
+    it { is_expected.to run.with_params('All Nodes').and_return({ 'All Nodes' => hashified['All Nodes'] }) }
   end
 end

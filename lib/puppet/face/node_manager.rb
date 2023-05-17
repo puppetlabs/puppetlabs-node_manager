@@ -29,18 +29,18 @@ Puppet::Face.define(:node_manager, '0.1.0') do
       options = args.last
 
       if options[:import]
-        fail('Choose import or export') if options[:export]
+        raise('Choose import or export') if options[:export]
 
         'Success' if classifier.import_hierarchy(read_import(options[:import]))
       else
-        groups  = classifier.get_groups
+        groups = classifier.get_groups
 
         if args.length == 2
           output << groups.select { |g| g['name'] == args.first }
         elsif args.length == 1
           output << groups
         else
-          fail("wrong number of arguments (#{args.length-1} for 1)")
+          raise("wrong number of arguments (#{args.length - 1} for 1)")
         end
         if options[:export]
           output.flatten.to_json
@@ -54,7 +54,7 @@ Puppet::Face.define(:node_manager, '0.1.0') do
       case output
       when Hash
         if output.length == 0
-          fail('No groups found')
+          raise('No groups found')
         elsif output.length == 1
           JSON.pretty_generate output.values[0]
         else
@@ -132,7 +132,7 @@ Puppet::Face.define(:node_manager, '0.1.0') do
       output.flatten
     end
 
-    when_rendering :console do |output, nodename, options|
+    when_rendering :console do |output, _nodename, options|
       if options[:explain] == true
         JSON.pretty_generate output.first['match_explanations']
       else
@@ -156,7 +156,6 @@ Puppet::Face.define(:node_manager, '0.1.0') do
 
       if options[:node_group]
         'Success' if classifier.pin_node(nodename, options[:node_group])
-      else
       end
     end
 
@@ -196,12 +195,12 @@ Puppet::Face.define(:node_manager, '0.1.0') do
         else
           PuppetX::Node_manager::Common.hashify_group_array(output.flatten.first['nodes'])
         end
-      else
-        'Success' if classifier.unpin_node(nodename, options[:node_group])
+      elsif classifier.unpin_node(nodename, options[:node_group])
+        'Success'
       end
     end
 
-    when_rendering :console do |output, nodename, options|
+    when_rendering :console do |output, _nodename, _options|
       if output.is_a?(String)
         output
       else
@@ -223,7 +222,7 @@ Puppet::Face.define(:node_manager, '0.1.0') do
       elsif args.length == 1
         output << environments
       else
-        fail("wrong number of arguments (#{args.length-1} for 1)")
+        raise("wrong number of arguments (#{args.length - 1} for 1)")
       end
       output.flatten
     end
@@ -231,12 +230,10 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     when_rendering :console do |output|
       if output.length > 1
         output
+      elsif output.first.class == Hash && output.first.has_key?('sync_succeeded')
+        output.first['sync_succeeded'].to_s
       else
-        if output.first.class == Hash && output.first.has_key?('sync_succeeded')
-          output.first['sync_succeeded'].to_s
-        else
-          fail('Environment doesn\'t exist.')
-        end
+        raise('Environment doesn\'t exist.')
       end
     end
   end
@@ -245,9 +242,9 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     if file && options[:explain]
       begin
         contents   = YAML.load_file(file)
-        contents ||= JSON.parse(File.read file)
+        contents ||= JSON.parse(File.read(file))
       rescue
-        fail "Could not file file '#{file}'"
+        raise "Could not file file '#{file}'"
       else
         contents
       end
@@ -257,13 +254,11 @@ Puppet::Face.define(:node_manager, '0.1.0') do
   end
 
   def read_import(file)
-    begin
-      contents = JSON.parse(File.read file)
-    rescue
-      fail "Could not read file '#{file}'"
-    else
-      contents
-    end
+    contents = JSON.parse(File.read(file))
+  rescue
+    raise "Could not read file '#{file}'"
+  else
+    contents
   end
 
   def cap_class_name(k)
