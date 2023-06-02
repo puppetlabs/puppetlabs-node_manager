@@ -1,3 +1,4 @@
+require 'puppet/network/http_pool'
 require 'json'
 
 class Puppet::Util::Nc_https
@@ -181,30 +182,20 @@ class Puppet::Util::Nc_https
   def do_https(endpoint, method = 'post', data = {})
     url  = "#{@classifier_url}/#{endpoint}"
     uri  = URI(url)
-    http = Net::HTTP.new(uri.host, uri.port)
-
-    unless @token and ! @token.empty?
-      Puppet.debug('Using SSL authentication')
-      http.use_ssl     = true
-      http.cert        = OpenSSL::X509::Certificate.new(File.read @certificate_path)
-      http.key         = OpenSSL::PKey::RSA.new(File.read @private_key_path)
-      http.ca_file     = @ca_certificate_path
-      http.verify_mode = OpenSSL::SSL::VERIFY_CLIENT_ONCE
-    else
-      Puppet.debug('Using token authentication')
-      http.use_ssl     = true
-      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    end
-
-    req              = Net::HTTP.const_get(method.capitalize).new(uri.request_uri)
-    req.body         = data.to_json
-    req.content_type = 'application/json'
-
-    # If using token
-    req['X-Authentication'] = @token if @token
+    ssl_context = Puppet.lookup(:ssl_context)
+    conn = Puppet::Network::HttpPool.connection(uri.host, uri.port, ssl_context: ssl_context)
 
     begin
-      res = http.request(req)
+      case method.capitalize
+        when 'Get'
+          res = conn.get(uri.path, {'Content-Type' => 'application/json'})
+        when 'Post'
+          res = conn.post(uri.path, data.to_json, {'Content-Type' => 'application/json'})
+        when 'Delete'
+          res = conn.delete(uri.path, {'Content-Type' => 'application/json'})
+        else
+          fail("Operation #{method.capitalize} is not supported!")
+      end
     rescue Exception => e
       fail(e.message)
       debug(e.backtrace.inspect)
@@ -212,6 +203,7 @@ class Puppet::Util::Nc_https
       res
     end
   end
+
   def error_msg(res)
     json = JSON.parse(res.body)
     kind = json['kind']
