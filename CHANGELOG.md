@@ -1,3 +1,10 @@
+## 2021-03-21 - Release 0.8.0
+
+### Summary
+
+- Updated for Ruby 3.x
+- Removal of deprecations
+
 ## 2021-03-21 - Release 0.7.5
 
 ### Summary
