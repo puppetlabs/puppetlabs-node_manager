@@ -12,19 +12,18 @@ rescue LoadError => e
 end
 
 class Puppet::Util::Node_groups < parent
-
   def initialize
     auth_info = {
-      "ca_certificate_path" => Puppet.settings['localcacert'],
-      "certificate_path"    => Puppet.settings['hostcert'],
-      "private_key_path"    => Puppet.settings['hostprivkey'],
+      'ca_certificate_path' => Puppet.settings['localcacert'],
+      'certificate_path'    => Puppet.settings['hostcert'],
+      'private_key_path'    => Puppet.settings['hostprivkey'],
     }
 
     begin
       nc_settings = YAML.load_file("#{Puppet.settings['confdir']}/classifier.yaml")
-      nc_settings = nc_settings.first if nc_settings.class == Array            
+      nc_settings = nc_settings.first if nc_settings.class == Array
     rescue
-      fail "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
+      raise "Could not find file #{Puppet.settings['confdir']}/classifier.yaml"
     else
       classifier_url = "https://#{nc_settings['server']}:#{nc_settings['port']}/classifier-api"
     end
