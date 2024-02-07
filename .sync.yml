@@ -5,4 +5,9 @@
 #
 # See https://github.com/puppetlabs/pdk-templates/blob/main/config_defaults.yml
 # for the default values.
---- {}
+---
+Gemfile:
+  optional:
+    ":development":
+    - gem: webmock
+      version: '~> 3.0'
