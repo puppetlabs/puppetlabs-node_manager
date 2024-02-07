@@ -37,7 +37,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
 
   def self.instances
     $ngs = classifier.groups.get_groups
-    $ngs.collect do |group|
+    $ngs.map do |group|
       ngs_hash = {}
       friendly_name.each do |property, friendly|
         # Replace parent ID with string name
@@ -58,8 +58,8 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   def self.prefetch(resources)
     deprecation_warning('This provider is being deprecated.  See https provider at https://github.com/WhatsARanjit/prosvcs-node_manager/blob/https_provider/HTTPS.md')
     ngs = instances
-    resources.keys.each do |group|
-      if provider = ngs.find { |g| g.name == group }
+    resources.each_key do |group|
+      if (provider = ngs.find { |g| g.name == group })
         resources[group].provider = provider
       end
     end
@@ -97,19 +97,16 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
     end
 
     resp = self.class.classifier.groups.create_group(send_data)
-    if resp
-      @resource.original_parameters.each_key do |k|
-        if k == :ensure
-          @property_hash[:ensure] = :present
-        else
-          @property_hash[k]       = @resource[k]
-        end
+    raise('puppetclassify was not able to create group') unless resp
+    @resource.original_parameters.each_key do |k|
+      if k == :ensure
+        @property_hash[:ensure] = :present
+      else
+        @property_hash[k]       = @resource[k]
       end
-      # Add placeholder for $ngs lookups
-      $ngs << { 'name' => send_data['name'], 'id' => resp }
-    else
-      raise('puppetclassify was not able to create group')
     end
+    # Add placeholder for $ngs lookups
+    $ngs << { 'name' => send_data['name'], 'id' => resp }
 
     exists? ? (return true) : (return false)
   end
@@ -150,7 +147,7 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
       elsif [:variables, :classes].include?(property)
         @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[property], value)
         # For logging return to original intended value
-        @resource[property] = value.select { |_k, v| !v.nil? }
+        @resource[property] = value.reject { |_k, v| v.nil? }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
@@ -170,15 +167,14 @@ Puppet::Type.type(:node_group).provide(:puppetclassify) do
   def flush
     return if @noflush
     debug @property_flush['attrs']
-    if @property_flush['attrs']
-      @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
-      begin
-        self.class.classifier.groups.update_group(@property_flush['attrs'])
-      rescue Exception => e
-        raise(e.message)
-        debug(e.backtrace.inspect)
-      else
-      end
+    return unless @property_flush['attrs']
+    @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
+    begin
+      self.class.classifier.groups.update_group(@property_flush['attrs'])
+    rescue Exception => e
+      raise(e.message)
+      debug(e.backtrace.inspect)
+    else
     end
   end
 

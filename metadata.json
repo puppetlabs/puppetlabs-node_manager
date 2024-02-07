@@ -1,33 +1,27 @@
 {
-  "name": "WhatsARanjit-node_manager",
-  "version": "0.8.0",
-  "author": "WhatsARanjit",
+  "name": "puppetlabs-node_manager",
+  "version": "1.0.0",
+  "author": "puppetlabs",
   "summary": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",
-  "source": "https://github.com/WhatsARanjit/puppet-node_manager",
-  "project_page": "https://github.com/WhatsARanjit/puppet-node_manager",
-  "issues_url": "https://github.com/WhatsARanjit/puppet-node_manager/issues",
-  "tags": [
-    "PE",
-    "puppet enterprise",
-    "node group",
-    "node_group",
-    "classification"
+  "source": "https://github.com/puppetlabs/puppetlabs-node_manager",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-node_manager",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-node_manager/issues",
+  "dependencies": [
+
   ],
-  "dependencies": [],
   "operatingsystem_support": [
     {
       "operatingsystem": "RedHat",
       "operatingsystemrelease": [
-        "6",
         "7",
-        "8"
+        "8",
+        "9"
       ]
     },
     {
       "operatingsystem": "CentOS",
       "operatingsystemrelease": [
-        "6",
         "7",
         "8"
       ]
@@ -35,25 +29,33 @@
     {
       "operatingsystem": "SLES",
       "operatingsystemrelease": [
-        "11",
-        "12"
+        "12",
+        "15"
       ]
     },
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "10.04",
-        "12.04",
-        "14.04",
-        "16.06",
-        "18.04"
+        "18.04",
+        "20.04",
+        "22.04"
       ]
     }
   ],
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.0.0 < 9.0.0"
+      "version_requirement": ">= 7.0.0 < 9.0.0"
     }
-  ]
+  ],
+  "tags": [
+    "PE",
+    "puppet enterprise",
+    "node group",
+    "node_group",
+    "classification"
+  ],
+  "pdk-version": "3.0.0",
+  "template-url": "pdk-default#3.0.0",
+  "template-ref": "tags/3.0.0-0-g056e50d"
 }

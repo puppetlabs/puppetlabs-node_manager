@@ -190,7 +190,7 @@ describe Puppet::Type.type(:node_group) do
     end
 
     it 'is not insync when `is` is only a subset of `should`' do
-      subset = hash.select { |k| k != 'class2' }
+      subset = hash.reject { |k| k == 'class2' }
       expect(resource.property(:data).insync?(subset)).to eq(false)
       expect(resource.property(:classes).insync?(subset)).to eq(false)
     end
