@@ -15,7 +15,7 @@ Manipulate node_groups from a system without Puppet installed.
 
 ```
 [root@server ~/node_manager/scripts]# ./node_group.sh -n 'Example Group' \
---rule '["or", ["=", "name", "node.whatsaranjit.com"]]' \
+--rule '["or", ["=", "name", "node.puppetlabs.com"]]' \
 --classes '{"vim": {}}' --variables '{"foo": "bar"}'
 New group ID: 15e0c815-e3ca-48e3-a467-e86e5b9d025e
 ```
@@ -25,7 +25,7 @@ New group ID: 15e0c815-e3ca-48e3-a467-e86e5b9d025e
 Place a file at `~/.node_managerrc` following this example:
 
 ```
-MASTER=master.whatsaranjit.com     # Defaults to hostname -f
+MASTER=master.puppetlabs.com     # Defaults to hostname -f
 PORT=4433                          # Defaults to 4433
 TOKEN='<your_token>'
 ```
@@ -56,7 +56,7 @@ Usage: ./node_group.sh [options] [UID]
                 Example: '{ "vim": {} }'
 
  -r| --rule       Array of rules for matching.
-                Example: '["or", ["=", "name", "node.whatsaranjit.com"]]'
+                Example: '["or", ["=", "name", "node.puppetlabs.com"]]'
 
  -v| --variables    Variables to set in the group.
                 Example: '{ "foo": "bar" }'

@@ -1,7 +1,16 @@
+#
+# TODO : Add documentation
+#
 module PuppetX; end
 
+#
+# TODO : Add documentation
+#
 module PuppetX::Node_manager; end
 
+#
+# TODO : Add documentation
+#
 module PuppetX::Node_manager::Common
   # Transform the node group array in to a hash
   # with a key of the name and an attribute

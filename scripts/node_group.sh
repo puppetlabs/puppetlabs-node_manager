@@ -19,7 +19,7 @@ Usage: $0 [options] [UID]\n
 -c| --classes        \t\t Hash of classes and parameters.\n
 \t                   \t\t Example: '{ "vim": {} }'\n\n
 -r| --rule           \t\t Array of rules for matching.\n
-\t                   \t\t Example: '["or", ["=", "name", "node.whatsaranjit.com"]]'\n\n
+\t                   \t\t Example: '["or", ["=", "name", "node.puppetlabs.com"]]'\n\n
 -v| --variables        \t Variables to set in the group.\n
 \t                   \t\t Example: '{ "foo": "bar" }'\n\n
 -a| --config_data      \t Configuration data for the group.\n

@@ -1,5 +1,7 @@
 require 'json'
-
+#
+# TODO : Add documentation
+#
 class Puppet::Util::Nc_https
   def initialize
     settings_file = if File.exist?("#{Puppet.settings['confdir']}/node_manager.yaml")
@@ -43,15 +45,15 @@ class Puppet::Util::Nc_https
   end
 
   def create_group(data)
-    endpoint = data.has_key?('id') ? "v1/groups/#{data['id']}" : 'v1/groups'
+    endpoint = data.key?('id') ? "v1/groups/#{data['id']}" : 'v1/groups'
     res = do_https(endpoint, 'POST', data)
     if res.code.to_i != 303
       error_msg(res)
       raise("Unable to create node_group '#{data['name']}'")
     else
-      new_UID = res['location'].split('/')[-1]
-      Puppet.notice("New node_group '#{data['name']}' with ID '#{new_UID}'")
-      new_UID
+      new_uid = res['location'].split('/')[-1]
+      Puppet.notice("New node_group '#{data['name']}' with ID '#{new_uid}'")
+      new_uid
     end
   end
 
@@ -68,7 +70,7 @@ class Puppet::Util::Nc_https
   def update_group(data)
     # ISSUE 26
     # Add nil for empty rules
-    data = Hash[data.map { |k, v| v == [''] ? [k, nil] : [k, v] }]
+    data = Hash[data.map { |k, v| (v == ['']) ? [k, nil] : [k, v] }]
 
     res = do_https("v1/groups/#{data['id']}", 'POST', data)
     if res.code.to_i != 200

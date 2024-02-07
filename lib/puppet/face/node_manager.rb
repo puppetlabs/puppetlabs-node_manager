@@ -5,7 +5,7 @@ require 'puppet_x/node_manager/common'
 
 Puppet::Face.define(:node_manager, '0.1.0') do
   summary 'Interact with node classifier API'
-  copyright 'WhatsARanjit', 2017
+  copyright 'puppetlabs', 2024
   license 'Apache-2.0'
 
   classifier = Puppet::Util::Nc_https.new
@@ -53,7 +53,7 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     when_rendering :console do |output|
       case output
       when Hash
-        if output.length == 0
+        if output.empty?
           raise('No groups found')
         elsif output.length == 1
           JSON.pretty_generate output.values[0]
@@ -230,7 +230,7 @@ Puppet::Face.define(:node_manager, '0.1.0') do
     when_rendering :console do |output|
       if output.length > 1
         output
-      elsif output.first.class == Hash && output.first.has_key?('sync_succeeded')
+      elsif output.first.class == Hash && output.first.key?('sync_succeeded')
         output.first['sync_succeeded'].to_s
       else
         raise('Environment doesn\'t exist.')
@@ -262,6 +262,6 @@ Puppet::Face.define(:node_manager, '0.1.0') do
   end
 
   def cap_class_name(k)
-    k.split('::').collect { |p| p.capitalize }.join('::')
+    k.split('::').map { |p| p.capitalize }.join('::')
   end
 end
