@@ -1,6 +1,6 @@
 # node_manager
 
-[![Donated by Ranjit Viswakumar](https://img.shields.io/badge/donated%20by-Rajjit%20Viswakumar-fb7047.svg)](#transfer-notice)
+[![Donated by Ranjit Viswakumar](https://img.shields.io/badge/donated%20by-Ranjit%20Viswakumar-fb7047.svg)](#transfer-notice)
 
 #### Table of Contents
 
