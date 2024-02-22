@@ -37,7 +37,7 @@ Puppet::Type.newtype(:node_group) do
     desc 'Match conditions for this group'
     def should
       case @resource[:purge_behavior]
-      when :rule, :all
+      when :rule, :all, :none
         super
       else
         a = @resource.property(:rule).retrieve || {}
