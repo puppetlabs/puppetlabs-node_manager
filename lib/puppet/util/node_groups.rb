@@ -11,6 +11,9 @@ rescue LoadError => e
   parent = Object
 end
 
+#
+# TODO : Add documentation
+#
 class Puppet::Util::Node_groups < parent
   def initialize
     auth_info = {
@@ -37,9 +40,8 @@ class Puppet::Util::Node_groups < parent
   def delete_environment(name)
     env_res = @puppet_https.delete("#{@nc_api_url}/v1/environments/#{name}")
 
-    unless env_res.code.to_i == 204
-      STDERR.puts "An error occured saving the environment: HTTP #{env_res.code} #{env_res.message}"
-      STDERR.puts env_res.body
-    end
+    return if env_res.code.to_i == 204
+    STDERR.puts "An error occured saving the environment: HTTP #{env_res.code} #{env_res.message}"
+    STDERR.puts env_res.body
   end
 end

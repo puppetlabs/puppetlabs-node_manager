@@ -1,4 +1,6 @@
-# node_manager [![Build Status](https://app.travis-ci.com/WhatsARanjit/puppet-node_manager.svg?branch=master)](https://app.travis-ci.com/WhatsARanjit/puppet-node_manager)
+# node_manager
+
+[![Donated by Ranjit Viswakumar](https://img.shields.io/badge/donated%20by-Ranjit%20Viswakumar-fb7047.svg)](#transfer-notice)
 
 #### Table of Contents
 
@@ -296,3 +298,7 @@ This repositority is largely the work of some Puppet community members.
 It is not officially maintained by Puppet, or any individual in
 particular. Issues should be opened in Github. Questions should be directed
 at the individuals responsible for committing that particular code.
+
+## Transfer notice
+
+This module was previously maintained by Ranjit Viswakumar. It was migrated to Puppet/Perforce in 2024.

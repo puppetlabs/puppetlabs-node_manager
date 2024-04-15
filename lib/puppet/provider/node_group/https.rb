@@ -39,7 +39,7 @@ Puppet::Type.type(:node_group).provide(:https) do
 
   def self.instances
     $ngs = classifier.get_groups
-    $ngs.collect do |group|
+    $ngs.map do |group|
       ngs_hash = {}
       friendly_name.each do |property, friendly|
         # Replace parent ID with string name
@@ -59,8 +59,8 @@ Puppet::Type.type(:node_group).provide(:https) do
 
   def self.prefetch(resources)
     ngs = instances
-    resources.keys.each do |group|
-      if provider = ngs.find { |g| g.name == group }
+    resources.each_key do |group|
+      if (provider = ngs.find { |g| g.name == group })
         resources[group].provider = provider
       end
     end
@@ -158,7 +158,7 @@ Puppet::Type.type(:node_group).provide(:https) do
       elsif [:variables, :classes, :config_data].include?(property)
         @property_flush['attrs'][property.to_s] = add_nulls(@property_hash[friendly.to_sym], value)
         # For logging return to original intended value
-        @resource[friendly.to_sym] = value.select { |_k, v| !v.nil? }
+        @resource[friendly.to_sym] = value.reject { |_k, v| v.nil? }
       else
         # The to_json function needs to recognize
         # booleans true/false, not symbols :true/false
@@ -178,10 +178,9 @@ Puppet::Type.type(:node_group).provide(:https) do
   def flush
     return if @noflush
     Puppet.debug @property_flush['attrs']
-    if @property_flush['attrs']
-      @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
-      self.class.classifier.update_group(@property_flush['attrs'])
-    end
+    return unless @property_flush['attrs']
+    @property_flush['attrs']['id'] = @property_hash[:id] unless @property_flush['attrs']['id']
+    self.class.classifier.update_group(@property_flush['attrs'])
   end
 
   private
