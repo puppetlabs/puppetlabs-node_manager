@@ -23,7 +23,7 @@ begin
   if res.is_a?(Hash)
     puts({ responsecode: res.code, responsebody: res.body }.to_json)
   else
-    puts({responsecode: 201, responsebody: %(#{env} update-classes triggered)}.to_json)
+    puts({ responsecode: 201, responsebody: %(#{env} update-classes triggered) }.to_json)
   end
   exit 0
 rescue Puppet::Error => e
