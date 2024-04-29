@@ -119,6 +119,51 @@ describe Puppet::Type.type(:node_group) do
         'classes::class3' => { 'param1' => 'existing',
                                'param2' => 'existing' } }
     end
+    let(:group_with_rule) do
+      {
+        name: 'test_group',
+        environment: 'test_env',
+        classes: {
+          'classes::class1' => { 'param1' => 'resource',
+                               'param2' => 'resource',
+                               'param3' => 'existing' },
+          'classes::class3' => { 'param1' => 'existing',
+                                'param2' => 'existing' }
+        },
+        rule:
+         ['or',
+          ['~', ['fact', 'fact1'], 'value1'],
+          ['~', ['fact', 'fact2'], 'value2']]
+      }
+    end
+    let(:and_rule) do
+      ['and',
+       ['~', ['fact', 'fact1'], 'value1'],
+       ['~', ['fact', 'fact2'], 'value2']]
+    end
+    let(:or_rule) do
+      ['or',
+       ['~', ['fact', 'fact1'], 'value1'],
+       ['~', ['fact', 'fact2'], 'value2']]
+    end
+
+    it 'matches rule exactly by default' do
+      rsrc = described_class.new(group_with_rule)
+      allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+      expect(rsrc.property(:rule).should).to eq group_with_rule[:rule]
+    end
+
+    it 'does not update rule when purge behaviour set to :none' do
+      rsrc = described_class.new(group_with_rule.merge(purge_behavior: 'none'))
+      allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+      expect(rsrc.property(:rule).should).to eq and_rule
+    end
+
+    it 'updates rule when purge behaviour set to :rule' do
+      rsrc = described_class.new(group_with_rule.merge(purge_behavior: 'rule'))
+      allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+      expect(rsrc.property(:rule).should).to eq group_with_rule[:rule]
+    end
 
     it 'matches classes and data exactly by default' do
       rsrc = described_class.new(resource_hash)
