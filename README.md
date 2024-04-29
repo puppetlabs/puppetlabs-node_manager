@@ -1,6 +1,6 @@
 # node_manager
 
-[![Donated by Ranjit](https://img.shields.io/badge/donated%20by-Vox%20Pupuli-fb7047.svg)](#transfer-notice)
+[![Donated by Ranjit](https://img.shields.io/badge/donated%20by-@WhatsARanjit-fb7047.svg)](#transfer-notice)
 
 #### Table of Contents
 
@@ -301,4 +301,4 @@ at the individuals responsible for committing that particular code.
 
 ## Transfer notice
 
-This module was previously maintained by Ranjit. It was migrated to Puppet/Perforce in 2023.
+This module was previously maintained by [Ranjit Viswakumar](https://github.com/WhatsARanjit). It was migrated to Puppet/Perforce in 2024.
