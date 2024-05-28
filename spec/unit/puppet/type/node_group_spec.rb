@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 describe Puppet::Type.type(:node_group) do
   it 'allows agent-specified environment' do
     expect {
@@ -73,8 +74,6 @@ describe Puppet::Type.type(:node_group) do
   end
 
   describe 'purge_behavior' do
-   
-
     let(:and_rule) do
       ['and',
        ['~', ['fact', 'fact1'], 'value1'],
@@ -105,14 +104,14 @@ describe Puppet::Type.type(:node_group) do
         }
       end
       let(:group_with_merged_and_rule) do
-        ["or", 
-          ["and", 
-            ["~", ["fact", "fact1"], "value1"], 
-            ["~", ["fact", "fact2"], "value2"]], 
-          ["~", ["fact", "fact1"], "value1"], 
-          ["~", ["fact", "fact2"], "value2"]]
+        ['or',
+         ['and',
+          ['~', ['fact', 'fact1'], 'value1'],
+          ['~', ['fact', 'fact2'], 'value2']],
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2']]
       end
-  
+
       it 'replaces by default' do
         rsrc = described_class.new(group_with_rule)
         # this is simulated data from the classifier service
@@ -163,20 +162,20 @@ describe Puppet::Type.type(:node_group) do
       # to the end
       # also the merging optimizes the pinned nodes to remove redundants.
       let(:merged_pinned_nodes_and_rule) do
-        ["or", 
-          ["and", 
-            ["~", ["fact", "fact1"], "value1"], 
-            ["~", ["fact", "fact2"], "value2"]], 
-          ["=", "name", "value1"], 
-          ["=", "name", "value2"]]
+        ['or',
+         ['and',
+          ['~', ['fact', 'fact1'], 'value1'],
+          ['~', ['fact', 'fact2'], 'value2']],
+         ['=', 'name', 'value1'],
+         ['=', 'name', 'value2']]
       end
 
       let(:merged_pinned_nodes_or_rule) do
-        ["or", 
-          ["~", ["fact", "fact1"], "value1"], 
-          ["~", ["fact", "fact2"], "value2"], 
-          ["=", "name", "value1"], 
-          ["=", "name", "value2"]]
+        ['or',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['=', 'name', 'value1'],
+         ['=', 'name', 'value2']]
       end
 
       it 'matches rule exactly by default' do
@@ -199,9 +198,9 @@ describe Puppet::Type.type(:node_group) do
 
       it 'merges pinned node correctly when purge behaviour set to :none' do
         rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'none'))
-        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(["=", "name", "value2"])
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(['=', 'name', 'value2'])
         # redundant node pinning is removed
-        expect(rsrc.property(:rule).should).to eq ["or", ["=", "name", "value2"], ["=", "name", "value1"]]
+        expect(rsrc.property(:rule).should).to eq ['or', ['=', 'name', 'value2'], ['=', 'name', 'value1']]
       end
 
       it 'replaces rule when purge behaviour set to :all' do
@@ -215,7 +214,6 @@ describe Puppet::Type.type(:node_group) do
         allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
         expect(rsrc.property(:rule).should).to eq group_with_pinned_nodes[:rule]
       end
-
     end
 
     describe 'group with top-level and clause' do
@@ -236,17 +234,17 @@ describe Puppet::Type.type(:node_group) do
       end
 
       let(:rule_combined_and_clauses) do
-        ["and",
-          ["~", ["fact", "fact1"], "value1"],
-          ["~", ["fact", "fact2"], "value2"],
-          ["~", ["fact", "pe_server_version"], ".+"]]
+        ['and',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['~', ['fact', 'pe_server_version'], '.+']]
       end
 
       let(:rule_combined_or_clauses) do
-        ["or",
-          ["~", ["fact", "fact1"], "value1"],
-          ["~", ["fact", "fact2"], "value2"],
-          ["and", ["~", ["fact", "pe_server_version"], ".+"]]]
+        ['or',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['and', ['~', ['fact', 'pe_server_version'], '.+']]]
       end
 
       it 'replaces rule exactly by default' do
@@ -269,9 +267,9 @@ describe Puppet::Type.type(:node_group) do
 
       it 'merges pinned node correctly when purge behaviour set to :none' do
         rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'none'))
-        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(["=", "name", "value2"])
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(['=', 'name', 'value2'])
         # redundant node pinning is removed
-        expect(rsrc.property(:rule).should).to eq ["or", ["=", "name", "value2"], ["and", ["~", ["fact", "pe_server_version"], ".+"]]]
+        expect(rsrc.property(:rule).should).to eq ['or', ['=', 'name', 'value2'], ['and', ['~', ['fact', 'pe_server_version'], '.+']]]
       end
 
       it 'replaces rule when purge behaviour set to :all' do
@@ -285,7 +283,6 @@ describe Puppet::Type.type(:node_group) do
         allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
         expect(rsrc.property(:rule).should).to eq group_with_and_clause[:rule]
       end
-
     end
 
     describe 'resource hash' do
@@ -305,7 +302,7 @@ describe Puppet::Type.type(:node_group) do
           },
         }
       end
-  
+
       let(:existing_data) do
         { 'data::class1' => { 'param1' => 'existing',
                               'param3' => 'existing' },
@@ -321,7 +318,7 @@ describe Puppet::Type.type(:node_group) do
           'data::class3' => { 'param1' => 'existing',
                               'param2' => 'existing' } }
       end
-  
+
       let(:existing_classes) do
         { 'classes::class1' => { 'param1' => 'existing',
                                  'param3' => 'existing' },
@@ -335,7 +332,7 @@ describe Puppet::Type.type(:node_group) do
           'classes::class3' => { 'param1' => 'existing',
                                  'param2' => 'existing' } }
       end
-  
+
       it 'matches classes and data exactly by default' do
         rsrc = described_class.new(resource_hash)
         allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
@@ -368,7 +365,6 @@ describe Puppet::Type.type(:node_group) do
         expect(rsrc.property(:classes).should).to eq(resource_hash[:classes])
       end
     end
-
   end
 
   describe '.insync? for data, classes' do
@@ -414,3 +410,4 @@ describe Puppet::Type.type(:node_group) do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
