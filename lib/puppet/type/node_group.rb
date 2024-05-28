@@ -37,73 +37,89 @@ Puppet::Type.newtype(:node_group) do
     desc 'Match conditions for this group'
     def should
       case @resource[:purge_behavior]
-      when :rule, :all
-        super
-      else
+      # only do something special when we are asked to merge, otherwise, fall back to the default
+      when :none
+        # rule grammar
+        #    condition : [ {bool} {condition}+ ] | [ "not" {condition} ] | {operation}
+        #    bool : "and" | "or"
+        #    operation : [ {operator} {fact-path} {value} ]
+        #    operator : "=" | "~" | ">" | ">=" | "<" | "<=" | "<:"
+        #    fact-path : {field-name} | [ {path-type} {field-name} {path-component}+ ]
+        #    path-type : "trusted" | "fact"
+        #    path-component : field-name | number
+        #    field-name : string
+        #    value : string
+
         a = @resource.property(:rule).retrieve || {}
         b = shouldorig
-        aorig = a.map(&:clone)
-        atmp = a.map(&:clone)
-        # check if the node classifer has any rules defined before attempting merge.
-        if a.length >= 2
-          if (a[0] == 'or') && (a[1][0] == 'or') || (a[1][0] == 'and')
-            # Merging both rules and pinned nodes
-            if (b[0] == 'or') && (b[1][0] == 'or') || (b[1][0] == 'and')
-              # b has rules to merge
-              rules = (atmp[1] + b[1].drop(1)).uniq
-              atmp[1] = rules
-              pinned = (b[2, b.length] + atmp[2, atmp.length]).uniq
-              merged = (atmp + pinned).uniq
-            elsif ((b[0] == 'and') || (b[0] == 'or')) && PuppetX::Node_manager::Common.factcheck(b)
-              # b only has rules to merge
-              rules = (atmp[1] + b.drop(1)).uniq
-              atmp[1] = rules
-              merged = atmp
-            else
-              pinned = (b[1, b.length] + atmp[2, atmp.length]).uniq
-              merged = (atmp + pinned).uniq
-            end
-          elsif (b[0] == 'or') && (b[1][0] == 'or') || (b[1][0] == 'and')
-            # Merging both rules and pinned nodes
-            rules = b[1] # no rules to merge on a side
-            pinned = (b[2, b.length] + a[1, a.length]).uniq
-            merged = (b + pinned).uniq
-          elsif ((a[0] == 'and') || (a[0] == 'or')) && PuppetX::Node_manager::Common.factcheck(a)
-            # a only has fact rules
-            if (b[0] == 'or') && !PuppetX::Node_manager::Common.factcheck(b)
-              # b only has pinned nodes
-              rules = atmp
-              temp = ['or']
-              temp[1] = atmp
-              merged = (temp + b[1, b.length]).uniq
-            else
-              # b only has rules
-              merged = (a + b.drop(1)).uniq
-            end
-          elsif (a[0] == 'or') && (a[1][1] == 'name')
-            # a only has pinned nodes
-            if (b[0] == 'or') && !PuppetX::Node_manager::Common.factcheck(b)
-              # b only has pinned nodes
-              merged = (b + a.drop(1)).uniq
-            else
-              # b only has rules
-              temp = ['or']
-              temp[1] = b
-              merged = (temp + atmp[1, atmp.length]).uniq
-            end
-          else
-            # default fall back.
-            merged = (b + a.drop(1)).uniq
-          end
-          if merged == aorig
-            # values are the same, returning orginal value"
-            aorig
-          else
-            merged
-          end
-        else
-          b
+
+        # extract all pinned nodes if any
+        # pinned nodes are in the form ['=', 'name', <hostname>]
+        apinned = []
+        a_without_pinned = a
+        if (a[0] == 'or')
+          apinned = a.select {|item| (item[0] == '=') && (item[1] == 'name')}
+          a_without_pinned = a.select { |item| (item[0] != '=') || (item[1] != 'name') }
         end
+        bpinned = []
+        b_without_pinned = b
+        merged = []
+        if (a == [""])
+           # ensure rules are unique at the top level and remove any empty rule sets
+          return b.uniq.select { |item| (item != ['or'] && item != ['and'] )}
+        elsif (b == [""])
+           # ensure rules are unique at the top level and remove any empty rule sets
+           return a.uniq.select { |item| (item != ['or'] && item != ['and'] )}
+        end
+
+        if (b[0] == 'or')
+          bpinned = b.select {|item| (item[0] == '=') && (item[1] == 'name')}
+          b_without_pinned = b.select { |item| (item[0] != '=') || (item[1] != 'name') }
+        end
+
+        if (((a[0] == 'and') || (a[0] == 'or')) && a[0] == b[0])
+          # if a and b start with the same 'and' or 'or' clause, we can just combine them
+          if (a[0] == 'or')
+            merged = (['or'] + a_without_pinned.drop(1) + b_without_pinned.drop(1) + apinned + bpinned).uniq
+          else 
+            # must both be 'and' clauses
+            if (apinned.length > 0 || bpinned.length > 0)
+              # we have pinned nodes
+              merged = (['or'] + [a_without_pinned + b_without_pinned.drop(1)] + apinned + bpinned).uniq
+            else 
+              # no pinned nodes and one top level 'and' clause, just combine them.
+              merged = a_without_pinned + b_without_pinned.drop(1)
+            end
+          end
+        else 
+          # first clause of a and b aren't equal 
+          # a first clause is one of and/or/not/operator
+          # b first clause is one of and/or/not/operator
+          # if a starts with `and` and b starts with `or`, create a top level `or` clause, nest a under it and append the rest of b
+          if (a_without_pinned[0] == 'and' && b_without_pinned[0] == 'or')
+            # special case of a only having one subclause
+            if (a_without_pinned.length == 2)
+              merged = (['or'] + a_without_pinned[1] + b_without_pinned.drop(1) + apinned + bpinned)
+            else 
+              merged = (['or'] + [a_without_pinned] + b_without_pinned.drop(1) + apinned + bpinned)
+            end
+          else
+            if (a_without_pinned[0] == 'or')
+              merged = (a_without_pinned + [b_without_pinned] + apinned + bpinned).uniq
+            else 
+              # if b starts with 'or', we want to be sure to drop that.
+              if (b_without_pinned[0] == 'or')
+                merged = (['or'] + [a_without_pinned] + b_without_pinned.drop(1) + apinned + bpinned)
+              else 
+                merged = (['or'] + [a_without_pinned] + [b_without_pinned] + apinned + bpinned)
+              end
+            end
+          end
+        end
+        # ensure rules are unique at the top level and remove any empty rule sets
+        merged.uniq.select { |item| (item != ['or'] && item != ['and'] )}
+      else
+        super
       end
     end
 
