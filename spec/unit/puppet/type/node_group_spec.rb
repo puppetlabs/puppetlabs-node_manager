@@ -1,5 +1,6 @@
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 describe Puppet::Type.type(:node_group) do
   it 'allows agent-specified environment' do
     expect {
@@ -73,83 +74,296 @@ describe Puppet::Type.type(:node_group) do
   end
 
   describe 'purge_behavior' do
-    let(:resource_hash) do
-      {
-        name: 'test_group',
-        environment: 'test_env',
-        data: {
-          'data::class1' => { 'param1' => 'resource',
-                              'param2' => 'resource' },
+    let(:and_rule) do
+      ['and',
+       ['~', ['fact', 'fact1'], 'value1'],
+       ['~', ['fact', 'fact2'], 'value2']]
+    end
+    let(:or_rule) do
+      ['or',
+       ['~', ['fact', 'fact1'], 'value1'],
+       ['~', ['fact', 'fact2'], 'value2']]
+    end
+
+    describe 'group_with_rule' do
+      let(:group_with_rule) do
+        {
+          name: 'test_group',
+          environment: 'test_env',
+          classes: {
+            'classes::class1' => { 'param1' => 'resource',
+                                 'param2' => 'resource',
+                                 'param3' => 'existing' },
+            'classes::class3' => { 'param1' => 'existing',
+                                  'param2' => 'existing' }
+          },
+          rule:
+           ['or',
+            ['~', ['fact', 'fact1'], 'value1'],
+            ['~', ['fact', 'fact2'], 'value2']]
+        }
+      end
+      let(:group_with_merged_and_rule) do
+        ['or',
+         ['and',
+          ['~', ['fact', 'fact1'], 'value1'],
+          ['~', ['fact', 'fact2'], 'value2']],
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2']]
+      end
+
+      it 'replaces by default' do
+        rsrc = described_class.new(group_with_rule)
+        # this is simulated data from the classifier service
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_rule[:rule]
+      end
+
+      it 'merges when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_rule.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_merged_and_rule
+      end
+
+      it 'replaces rule when purge behaviour set to :all' do
+        rsrc = described_class.new(group_with_rule.merge(purge_behavior: 'all'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_rule[:rule]
+      end
+
+      it 'updates rule when purge behaviour set to :rule' do
+        rsrc = described_class.new(group_with_rule.merge(purge_behavior: 'rule'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_rule[:rule]
+      end
+    end
+
+    describe 'group with pinned nodes' do
+      let(:group_with_pinned_nodes) do
+        {
+          name: 'test_group',
+          environment: 'test_env',
+          classes: {
+            'classes::class1' => { 'param1' => 'resource',
+                                 'param2' => 'resource',
+                                 'param3' => 'existing' },
+            'classes::class3' => { 'param1' => 'existing',
+                                  'param2' => 'existing' }
+          },
+          rule:
+           ['or',
+            ['=', 'name', 'value1'],
+            ['=', 'name', 'value2'],
+            ['=', 'name', 'value2']]
+        }
+      end
+
+      # when merging the pinned nodes and the and rule, the top level "or" clause should be maintained, and the pinned nodes added
+      # to the end
+      # also the merging optimizes the pinned nodes to remove redundants.
+      let(:merged_pinned_nodes_and_rule) do
+        ['or',
+         ['and',
+          ['~', ['fact', 'fact1'], 'value1'],
+          ['~', ['fact', 'fact2'], 'value2']],
+         ['=', 'name', 'value1'],
+         ['=', 'name', 'value2']]
+      end
+
+      let(:merged_pinned_nodes_or_rule) do
+        ['or',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['=', 'name', 'value1'],
+         ['=', 'name', 'value2']]
+      end
+
+      it 'matches rule exactly by default' do
+        rsrc = described_class.new(group_with_pinned_nodes)
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_pinned_nodes[:rule]
+      end
+
+      it 'merges and rule correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq merged_pinned_nodes_and_rule
+      end
+
+      it 'merges or rule correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(or_rule)
+        expect(rsrc.property(:rule).should).to eq merged_pinned_nodes_or_rule
+      end
+
+      it 'merges pinned node correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(['=', 'name', 'value2'])
+        # redundant node pinning is removed
+        expect(rsrc.property(:rule).should).to eq ['or', ['=', 'name', 'value2'], ['=', 'name', 'value1']]
+      end
+
+      it 'replaces rule when purge behaviour set to :all' do
+        rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'all'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_pinned_nodes[:rule]
+      end
+
+      it 'replaces rule when purge behaviour set to :rule' do
+        rsrc = described_class.new(group_with_pinned_nodes.merge(purge_behavior: 'rule'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_pinned_nodes[:rule]
+      end
+    end
+
+    describe 'group with top-level and clause' do
+      let(:group_with_and_clause) do
+        {
+          name: 'test_group',
+          environment: 'test_env',
+          classes: {
+            'classes::class1' => { 'param1' => 'resource',
+                                 'param2' => 'resource',
+                                 'param3' => 'existing' },
+            'classes::class3' => { 'param1' => 'existing',
+                                  'param2' => 'existing' }
+          },
+          rule:
+           ['and', ['~', ['fact', 'pe_server_version'], '.+']]
+        }
+      end
+
+      let(:rule_combined_and_clauses) do
+        ['and',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['~', ['fact', 'pe_server_version'], '.+']]
+      end
+
+      let(:rule_combined_or_clauses) do
+        ['or',
+         ['~', ['fact', 'fact1'], 'value1'],
+         ['~', ['fact', 'fact2'], 'value2'],
+         ['and', ['~', ['fact', 'pe_server_version'], '.+']]]
+      end
+
+      it 'replaces rule exactly by default' do
+        rsrc = described_class.new(group_with_and_clause)
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_and_clause[:rule]
+      end
+
+      it 'merges and rule correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq rule_combined_and_clauses
+      end
+
+      it 'merges or rule correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(or_rule)
+        expect(rsrc.property(:rule).should).to eq rule_combined_or_clauses
+      end
+
+      it 'merges pinned node correctly when purge behaviour set to :none' do
+        rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(['=', 'name', 'value2'])
+        # redundant node pinning is removed
+        expect(rsrc.property(:rule).should).to eq ['or', ['=', 'name', 'value2'], ['and', ['~', ['fact', 'pe_server_version'], '.+']]]
+      end
+
+      it 'replaces rule when purge behaviour set to :all' do
+        rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'all'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_and_clause[:rule]
+      end
+
+      it 'replaces rule when purge behaviour set to :rule' do
+        rsrc = described_class.new(group_with_and_clause.merge(purge_behavior: 'rule'))
+        allow(rsrc.property(:rule)).to receive(:retrieve).and_return(and_rule)
+        expect(rsrc.property(:rule).should).to eq group_with_and_clause[:rule]
+      end
+    end
+
+    describe 'resource hash' do
+      let(:resource_hash) do
+        {
+          name: 'test_group',
+          environment: 'test_env',
+          data: {
+            'data::class1' => { 'param1' => 'resource',
+                                'param2' => 'resource' },
+            'data::class2' => { 'param1' => 'resource',
+                                'param2' => 'resource' },
+          },
+          classes: {
+            'classes::class1' => { 'param1' => 'resource',
+                                   'param2' => 'resource' },
+          },
+        }
+      end
+
+      let(:existing_data) do
+        { 'data::class1' => { 'param1' => 'existing',
+                              'param3' => 'existing' },
+          'data::class3' => { 'param1' => 'existing',
+                              'param2' => 'existing' } }
+      end
+      let(:merged_data) do
+        { 'data::class1' => { 'param1' => 'resource',
+                              'param2' => 'resource',
+                              'param3' => 'existing' },
           'data::class2' => { 'param1' => 'resource',
                               'param2' => 'resource' },
-        },
-        classes: {
-          'classes::class1' => { 'param1' => 'resource',
-                                 'param2' => 'resource' },
-        },
-      }
-    end
+          'data::class3' => { 'param1' => 'existing',
+                              'param2' => 'existing' } }
+      end
 
-    let(:existing_data) do
-      { 'data::class1' => { 'param1' => 'existing',
-                            'param3' => 'existing' },
-        'data::class3' => { 'param1' => 'existing',
-                            'param2' => 'existing' } }
-    end
-    let(:merged_data) do
-      { 'data::class1' => { 'param1' => 'resource',
-                            'param2' => 'resource',
-                            'param3' => 'existing' },
-        'data::class2' => { 'param1' => 'resource',
-                            'param2' => 'resource' },
-        'data::class3' => { 'param1' => 'existing',
-                            'param2' => 'existing' } }
-    end
+      let(:existing_classes) do
+        { 'classes::class1' => { 'param1' => 'existing',
+                                 'param3' => 'existing' },
+          'classes::class3' => { 'param1' => 'existing',
+                                 'param2' => 'existing' } }
+      end
+      let(:merged_classes) do
+        { 'classes::class1' => { 'param1' => 'resource',
+                                 'param2' => 'resource',
+                                 'param3' => 'existing' },
+          'classes::class3' => { 'param1' => 'existing',
+                                 'param2' => 'existing' } }
+      end
 
-    let(:existing_classes) do
-      { 'classes::class1' => { 'param1' => 'existing',
-                               'param3' => 'existing' },
-        'classes::class3' => { 'param1' => 'existing',
-                               'param2' => 'existing' } }
-    end
-    let(:merged_classes) do
-      { 'classes::class1' => { 'param1' => 'resource',
-                               'param2' => 'resource',
-                               'param3' => 'existing' },
-        'classes::class3' => { 'param1' => 'existing',
-                               'param2' => 'existing' } }
-    end
+      it 'matches classes and data exactly by default' do
+        rsrc = described_class.new(resource_hash)
+        allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
+        allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
+        expect(rsrc.property(:data).should).to eq resource_hash[:data]
+        expect(rsrc.property(:classes).should).to eq resource_hash[:classes]
+      end
 
-    it 'matches classes and data exactly by default' do
-      rsrc = described_class.new(resource_hash)
-      allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
-      allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
-      expect(rsrc.property(:data).should).to eq resource_hash[:data]
-      expect(rsrc.property(:classes).should).to eq resource_hash[:classes]
-    end
+      it 'merges in classes and data when set to :none' do
+        rsrc = described_class.new(resource_hash.merge(purge_behavior: 'none'))
+        allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
+        allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
+        expect(rsrc.property(:data).should).to eq(merged_data)
+        expect(rsrc.property(:classes).should).to eq(merged_classes)
+      end
 
-    it 'merges in classes and data when set to :none' do
-      rsrc = described_class.new(resource_hash.merge(purge_behavior: 'none'))
-      allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
-      allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
-      expect(rsrc.property(:data).should).to eq(merged_data)
-      expect(rsrc.property(:classes).should).to eq(merged_classes)
-    end
+      it 'merges in classes and match data exactly when set to :data' do
+        rsrc = described_class.new(resource_hash.merge(purge_behavior: 'data'))
+        allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
+        allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
+        expect(rsrc.property(:data).should).to eq(resource_hash[:data])
+        expect(rsrc.property(:classes).should).to eq(merged_classes)
+      end
 
-    it 'merges in classes and match data exactly when set to :data' do
-      rsrc = described_class.new(resource_hash.merge(purge_behavior: 'data'))
-      allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
-      allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
-      expect(rsrc.property(:data).should).to eq(resource_hash[:data])
-      expect(rsrc.property(:classes).should).to eq(merged_classes)
-    end
-
-    it 'merges in data and match classes exactly when set to :classes' do
-      rsrc = described_class.new(resource_hash.merge(purge_behavior: 'classes'))
-      allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
-      allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
-      expect(rsrc.property(:data).should).to eq(merged_data)
-      expect(rsrc.property(:classes).should).to eq(resource_hash[:classes])
+      it 'merges in data and match classes exactly when set to :classes' do
+        rsrc = described_class.new(resource_hash.merge(purge_behavior: 'classes'))
+        allow(rsrc.property(:data)).to receive(:retrieve).and_return(existing_data)
+        allow(rsrc.property(:classes)).to receive(:retrieve).and_return(existing_classes)
+        expect(rsrc.property(:data).should).to eq(merged_data)
+        expect(rsrc.property(:classes).should).to eq(resource_hash[:classes])
+      end
     end
   end
 
@@ -196,3 +410,4 @@ describe Puppet::Type.type(:node_group) do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
