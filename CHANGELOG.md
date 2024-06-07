@@ -1,130 +1,125 @@
-## 2023-06-14 - Release 0.8.0
+<!-- markdownlint-disable MD024 -->
+# Changelog
 
-### Summary
+All notable changes to this project will be documented in this file.
 
-- Updated for Ruby 3.x
-- Removal of deprecations
+The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
-## 2021-03-21 - Release 0.7.5
+## [v1.0.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/v1.0.0) - 2024-06-07
 
-### Summary
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.8.0...v1.0.0)
 
-- Fix `purge_behavior` bug which prevented node group creation when using this parameter
-- Validate user input for the `override_environment` parameter. This parameter must be boolean to be valid. Previously, no error was raised until the type was synced. Now, the input will be validated early. Note that boolean-coerced strings such as "true", "false" are permitted.
-- Additional Gemfile cleanup
-- LTS Travis testing updates
+### Added
 
-## 2021-01-12 - Release 0.7.4
+- (CAT-1731) improve handling of pinned nodes [#80](https://github.com/puppetlabs/puppetlabs-node_manager/pull/80) ([jonathannewman](https://github.com/jonathannewman))
 
-### Summary
+### Fixed
 
-- Add `purge_behavior` parameter to node\_group resource type
-- Cleaned up Gemfile
+- (CAT-1731) add rules tests [#81](https://github.com/puppetlabs/puppetlabs-node_manager/pull/81) ([jonathannewman](https://github.com/jonathannewman))
 
-## 2019-12-27 - Release 0.7.3
+## [0.8.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.8.0) - 2023-06-14
 
-### Summary
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.6...0.8.0)
 
-- Updating version to be compatible with Puppet 5
+## [0.7.6](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.6) - 2023-04-05
 
-## 2019-06-20 - Release 0.7.2
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.5...0.7.6)
 
-### Summary
+### Added
 
-- `Update to allow get_nodes() without argument`
+- Added ability to set the purge behavior for node group rules [#68](https://github.com/puppetlabs/puppetlabs-node_manager/pull/68) ([benjamin-robertson](https://github.com/benjamin-robertson))
 
-#### Bugfixes
+## [0.7.5](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.5) - 2023-04-05
 
-- Unpin actions had an errant pry statement
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.4...0.7.5)
 
-## 2018-03-15 - Release 0.7.1
+### Added
 
-## Summary
+- Added ability to set the purge behavior for node group rules [#68](https://github.com/puppetlabs/puppetlabs-node_manager/pull/68) ([benjamin-robertson](https://github.com/benjamin-robertson))
+- Force override_environment to a symbol to maintain idempotency. [#67](https://github.com/puppetlabs/puppetlabs-node_manager/pull/67) ([bwilcox](https://github.com/bwilcox))
+- Allow string bool input for override_environment [#61](https://github.com/puppetlabs/puppetlabs-node_manager/pull/61) ([reidmv](https://github.com/reidmv))
 
-- Typo fix in README
-- Change of repo name to puppet-node_manager
+### Fixed
 
-## 2018-03-15 - Release 0.7.0
+- Fixing bug where false variables are treated as nil [#69](https://github.com/puppetlabs/puppetlabs-node_manager/pull/69) ([rcontisplk](https://github.com/rcontisplk))
+- Updated PE test versions [#65](https://github.com/puppetlabs/puppetlabs-node_manager/pull/65) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- Fixes bad schema issues with purge_behavior [#62](https://github.com/puppetlabs/puppetlabs-node_manager/pull/62) ([ody](https://github.com/ody))
 
-### Summary
+## [0.7.4](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.4) - 2021-01-12
 
-- Added task for update-classes endpoint
-- JRuby method fix for Net::Http
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.3...0.7.4)
 
-## 2018-01-31 - Release 0.6.1
+### Added
 
-### Summary
+- Implement `purge_behavior` parameter [#60](https://github.com/puppetlabs/puppetlabs-node_manager/pull/60) ([reidmv](https://github.com/reidmv))
+- Adding Puppet5 tests [#50](https://github.com/puppetlabs/puppetlabs-node_manager/pull/50) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-- Typo in face output
-- JRuby method fix
+## [0.7.3](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.3) - 2019-12-27
 
-## 2017-10-20 - Release 0.6.0
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.2...0.7.3)
 
-### Summary
+### Fixed
 
-- Added `pin` action to face
-- Added `data` parameter to `node_group` type for Console data
-- Added support for `data` parameter to `https` provider
-- Added `config_data` argument to puppet-less provider
+- Update metadata to indicate compatibility with Puppet 6 [#47](https://github.com/puppetlabs/puppetlabs-node_manager/pull/47) ([gabe-sky](https://github.com/gabe-sky))
 
-## 2017-08-20 - Release 0.5.0
+## [0.7.2](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.2) - 2019-06-20
 
-### Summary
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.7.1...0.7.2)
 
-- Can remove parameters from classes
-- Can upin nodes from a group
-- Added a puppet-less provider for node_group in bash
-- Removed puppet_environment type and provider
-- Removed puppetclassify provider and gem dependency
+## [0.7.1](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.7.1) - 2018-03-16
 
-#### Bugfixes
-- Provider submits nulls for removed parameters to remove them
-- Submitting `''` to rules can remove everything
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.6.0...0.7.1)
 
+### Added
 
-## 2017-05-12  - Release 0.4.2
+- New task for update-classes API [#41](https://github.com/puppetlabs/puppetlabs-node_manager/pull/41) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- PR-35: Make error message more informative [#39](https://github.com/puppetlabs/puppetlabs-node_manager/pull/39) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- Added Console config_data support [#33](https://github.com/puppetlabs/puppetlabs-node_manager/pull/33) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-### Summary
+### Fixed
 
-- Added a `node_manager` face for classifier API
-- Added ability to manage node_groups using SSL or token authentication
-- Added ability to manage node_groups from a remote client
-- Set `https` provider as default
+- Fix Net::Http::Get constant error [#37](https://github.com/puppetlabs/puppetlabs-node_manager/pull/37) ([natemccurdy](https://github.com/natemccurdy))
 
-#### Bugfixes
+## [0.6.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.6.0) - 2017-10-20
 
-- `classes` attribute Hash is now deep-sorted to maintain idempotency
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.5.0...0.6.0)
 
-## 2017-03-31 - Release 0.4.1
+## [0.5.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.5.0) - 2017-08-20
 
-### Summary
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.4.2...0.5.0)
 
-- Added `description` attribute to groups
+### Added
 
-#### Bugfixes
+- Release polish [#24](https://github.com/puppetlabs/puppetlabs-node_manager/pull/24) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-- Added logic for cancelling unwanted classes/variables
-- Able to now submit empty class/variables values
+### Fixed
 
-## 2017-03-30 - Release 0.4.0
+- Issue 26 [#30](https://github.com/puppetlabs/puppetlabs-node_manager/pull/30) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- Issue 25 [#29](https://github.com/puppetlabs/puppetlabs-node_manager/pull/29) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-### Summary
+## [0.4.2](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.4.2) - 2017-05-12
 
-- Added `https` provider which doesn't need `puppeclassify` gem
-- Added deprecation notice for `puppetclassify` provider
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.4.1...0.4.2)
 
-## 2016-10-26 - Release 0.3.0
-### Summary
+### Added
 
-Needed to pin some gems because Ruby 2.1.x is approaching end of life.
+- Initial commit on face [#21](https://github.com/puppetlabs/puppetlabs-node_manager/pull/21) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- Initial commit for remote authentication [#20](https://github.com/puppetlabs/puppetlabs-node_manager/pull/20) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-#### Bugfixes
-- Hardened ruby load issues on agents
+### Fixed
 
-## 2015-11-15 - Release 0.2.1
-### Summary
+- Hash order [#16](https://github.com/puppetlabs/puppetlabs-node_manager/pull/16) ([WhatsARanjit](https://github.com/WhatsARanjit))
 
-Add some bugfixes.
+## [0.4.1](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.4.1) - 2017-03-31
 
-#### Bugfixes
-- Added empty dependencies to metadata.json to fix `puppet module list` error.
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.1.0...0.4.1)
+
+### Added
+
+- Added logic for cancelling unwanted classes/variables for issue #11 [#14](https://github.com/puppetlabs/puppetlabs-node_manager/pull/14) ([WhatsARanjit](https://github.com/WhatsARanjit))
+- Fix markdown rendering issues [#12](https://github.com/puppetlabs/puppetlabs-node_manager/pull/12) ([natemccurdy](https://github.com/natemccurdy))
+- Initial release of https provider [#8](https://github.com/puppetlabs/puppetlabs-node_manager/pull/8) ([WhatsARanjit](https://github.com/WhatsARanjit))
+
+## [0.1.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/0.1.0) - 2015-04-11
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0520df7a19dc78ebdd07338881a88be0e8a41eef...0.1.0)
