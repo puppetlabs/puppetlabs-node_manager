@@ -4,9 +4,9 @@
   "author": "puppetlabs",
   "summary": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",
-  "source": "https://github.com/puppetlabs/puppet-node_manager",
-  "project_page": "https://github.com/puppetlabs/puppet-node_manager",
-  "issues_url": "https://github.com/puppetlabs/puppet-node_manager/issues",
+  "source": "https://github.com/puppetlabs/puppetlabs-node_manager",
+  "project_page": "https://github.com/puppetlabs/puppetlabs-node_manager",
+  "issues_url": "https://github.com/puppetlabs/puppetlabs-node_manager/issues",
   "dependencies": [
 
   ],
