@@ -1,4 +1,4 @@
-require 'puppet_x/node_manager/common'
+require_relative '../../puppet_x/node_manager/common'
 require 'puppet/property/boolean'
 
 Puppet::Type.newtype(:node_group) do

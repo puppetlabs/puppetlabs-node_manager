@@ -1,4 +1,4 @@
-require 'puppet/util/node_groups'
+require_relative '../../util/node_groups'
 
 Puppet::Type.type(:node_group).provide(:puppetclassify) do
   confine feature: :puppetclassify

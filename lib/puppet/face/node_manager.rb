@@ -1,7 +1,7 @@
 require 'puppet'
 require 'puppet/face'
-require 'puppet/util/nc_https'
-require 'puppet_x/node_manager/common'
+require_relative '../util/nc_https'
+require_relative '../../puppet_x/node_manager/common'
 
 Puppet::Face.define(:node_manager, '0.1.0') do
   summary 'Interact with node classifier API'
