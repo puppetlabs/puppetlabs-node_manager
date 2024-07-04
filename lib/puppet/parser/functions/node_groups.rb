@@ -1,11 +1,5 @@
-begin
-  require 'puppet/util/nc_https'
-  require 'puppet_x/node_manager/common'
-rescue LoadError
-  mod = Puppet::Module.find('node_manager', Puppet[:environment].to_s)
-  require File.join mod.path, 'lib/puppet/util/nc_https'
-  require File.join mod.path, 'lib/puppet_x/node_manager/common'
-end
+require_relative '../../util/nc_https'
+require_relative '../../../puppet_x/node_manager/common'
 
 module Puppet::Parser::Functions
   newfunction(:node_groups, :type => :rvalue) do |args|
