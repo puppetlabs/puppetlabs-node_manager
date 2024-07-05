@@ -2,6 +2,8 @@
 
 [![Donated by Ranjit](https://img.shields.io/badge/donated%20by-@WhatsARanjit-fb7047.svg)](#transfer-notice)
 
+We would like to inform you that during the release of version 1.0.0, the corresponding tag v1.0.0 was not created. After recognizing this, we created the tag, but it was created from the HEAD commit, so we deleted the newly created tag. To address this, we are publishing a new release, 1.0.1.
+
 #### Table of Contents
 
 1. [Overview](#overview)
