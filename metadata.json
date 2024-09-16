@@ -1,6 +1,6 @@
 {
   "name": "puppetlabs-node_manager",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": "puppetlabs",
   "summary": "Create and manage PE Console node groups as resources.",
   "license": "Apache-2.0",

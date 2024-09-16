@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
 
+## [v1.1.0](https://github.com/puppetlabs/puppetlabs-node_manager/tree/v1.1.0) - 2024-09-16
+
+[Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/v1.0.1...v1.1.0)
+
+### Added
+
+- node_group type: Allow uppercase letters in environment names [#95](https://github.com/puppetlabs/puppetlabs-node_manager/pull/95) ([bastelfreak](https://github.com/bastelfreak))
+
 ## [v1.0.1](https://github.com/puppetlabs/puppetlabs-node_manager/tree/v1.0.1) - 2024-07-05
 
 [Full Changelog](https://github.com/puppetlabs/puppetlabs-node_manager/compare/0.8.0...v1.0.1)
