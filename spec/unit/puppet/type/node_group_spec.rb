@@ -20,6 +20,33 @@ describe Puppet::Type.type(:node_group) do
     }.not_to raise_error
   end
 
+  it 'allows uppercase environment name without underscore' do
+    expect {
+      Puppet::Type.type(:node_group).new(
+        name: 'stubname',
+        environment: 'ENVIRONMENTNAME',
+      )
+    }.not_to raise_error
+  end
+
+  it 'allows uppercase environment name with an underscore' do
+    expect {
+      Puppet::Type.type(:node_group).new(
+        name: 'stubname',
+        environment: 'ENVIRONMENT_NAME',
+      )
+    }.not_to raise_error
+  end
+
+  it 'allows capitalized environment name with an underscore' do
+    expect {
+      Puppet::Type.type(:node_group).new(
+        name: 'stubname',
+        environment: 'Environment_name',
+      )
+    }.not_to raise_error
+  end
+
   it 'allows environment name with a number' do
     expect {
       Puppet::Type.type(:node_group).new(
@@ -53,7 +80,7 @@ describe Puppet::Type.type(:node_group) do
         name: 'stubname',
         environment: 'not-a-valid-name',
       )
-    }.to raise_error(%r{Invalid environment name})
+    }.to raise_error(%r{Invalid environment name: not-a-valid-name})
   end
 
   it 'allows name with symbols, numbers, and whitespace' do
