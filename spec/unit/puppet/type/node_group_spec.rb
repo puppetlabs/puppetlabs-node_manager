@@ -80,7 +80,7 @@ describe Puppet::Type.type(:node_group) do
         name: 'stubname',
         environment: 'not-a-valid-name',
       )
-    }.to raise_error(%r{Invalid environment name})
+    }.to raise_error(%r{Invalid environment name: not-a-valid-name})
   end
 
   it 'allows name with symbols, numbers, and whitespace' do
