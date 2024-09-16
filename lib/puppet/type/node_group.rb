@@ -123,7 +123,7 @@ Puppet::Type.newtype(:node_group) do
     desc 'Environment for this group'
     defaultto :production
     validate do |value|
-      raise('Invalid environment name') unless value =~ (%r{\A[a-z0-9_]+\Z}) || (value == 'agent-specified')
+      raise('Invalid environment name') unless value =~ (%r{\A[a-zA-Z0-9_]+\Z}) || (value == 'agent-specified')
     end
   end
   newproperty(:classes) do
