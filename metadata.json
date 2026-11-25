@@ -48,7 +48,7 @@
   "requirements": [
     {
       "name": "puppet",
-      "version_requirement": ">= 6.0.0 < 9.0.0"
+      "version_requirement": ">= 6.0.0 < 10.0.0"
     }
   ],
   "tags": [
@@ -58,7 +58,7 @@
     "node_group",
     "classification"
   ],
-  "pdk-version": "2.7.1",
-  "template-url": "pdk-default#2.7.4",
-  "template-ref": "tags/2.7.4-0-g58edf57"
+  "pdk-version": "3.0.1",
+  "template-url": "https://github.com/puppetlabs/pdk-templates.git#main",
+  "template-ref": "heads/main-0-g8ca954f"
 }

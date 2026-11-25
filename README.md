@@ -27,7 +27,7 @@ Create and manage PE node groups as resources.
 ## Requirements
 
 * \*nix operating system
-* Puppet >= 3.7.1
+* Puppet >= 6.0.0 < 10.0.0 (including Puppet Core 9)
 * New `https` provider which doesn't need `puppetclassify` gem
 
 ## Authentication

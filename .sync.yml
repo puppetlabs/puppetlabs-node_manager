@@ -11,3 +11,13 @@ Gemfile:
     ":development":
     - gem: webmock
       version: '~> 3.0'
+".gitlab-ci.yml":
+  delete: true
+appveyor.yml:
+  delete: true
+.travis.yml:
+  delete: true
+.rubocop.yml:
+  include_todos: true
+spec/spec_helper.rb:
+  mock_with: ":rspec"
